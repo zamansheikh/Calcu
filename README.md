@@ -19,7 +19,7 @@ English
 [![GitHub all releases](https://img.shields.io/github/downloads/zamansheikh/Calcu/total?label=Downloads&logo=github)](https://github.com/zamansheikh/Calcu/releases/)
 [![GitHub Repo stars](https://img.shields.io/github/stars/zamansheikh/Calcu?color=informational&label=Stars)](https://github.com/zamansheikh/Calcu)
 [![Supported Sites](https://img.shields.io/badge/Supported-Sites-9cf.svg?style=flat)](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
-[![Telegram Channel](https://img.shields.io/badge/Telegram-chatbot-blue?style=flat&logo=telegram)](https://t.me/decodersfamily)
+[![Telegram Channel](https://img.shields.io/badge/Telegram-deCodersFamily-blue?style=flat&logo=telegram)](https://t.me/decodersfamily)
 
 
 </div>
