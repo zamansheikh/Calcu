@@ -4,7 +4,7 @@
 
 <img width="" src="assets/icon/app_icon.png"  width=160 height=160  align="center">
 
-# calcu
+# Calcu
 
 ### A Featuristic basic Calculator app for all
 
