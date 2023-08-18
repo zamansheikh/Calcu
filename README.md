@@ -13,11 +13,11 @@ English
 &nbsp;&nbsp;
 
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/zamansheikh/chatbot?color=black&label=Stable&logo=github)](https://github.com/zamansheikh/chatbot/releases/latest/)
-[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/zamansheikh/chatbot?include_prereleases&label=Preview&logo=Github)](https://github.com/zamansheikh/chatbot/releases/)
-[![Keep a Changelog](https://img.shields.io/badge/Changelog-lightgray?style=flat&color=gray&logo=keep-a-changelog)](https://github.com/zamansheikh/chatbot/blob/main/CHANGELOG.md)
-[![GitHub all releases](https://img.shields.io/github/downloads/zamansheikh/chatbot/total?label=Downloads&logo=github)](https://github.com/zamansheikh/chatbot/releases/)
-[![GitHub Repo stars](https://img.shields.io/github/stars/zamansheikh/chatbot?color=informational&label=Stars)](https://github.com/zamansheikh/chatbot)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/zamansheikh/Calcu?color=black&label=Stable&logo=github)](https://github.com/zamansheikh/Calcu/releases/latest/)
+[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/zamansheikh/Calcu?include_prereleases&label=Preview&logo=Github)](https://github.com/zamansheikh/Calcu/releases/)
+[![Keep a Changelog](https://img.shields.io/badge/Changelog-lightgray?style=flat&color=gray&logo=keep-a-changelog)](https://github.com/zamansheikh/Calcu/blob/main/CHANGELOG.md)
+[![GitHub all releases](https://img.shields.io/github/downloads/zamansheikh/Calcu/total?label=Downloads&logo=github)](https://github.com/zamansheikh/Calcu/releases/)
+[![GitHub Repo stars](https://img.shields.io/github/stars/zamansheikh/Calcu?color=informational&label=Stars)](https://github.com/zamansheikh/Calcu)
 [![Supported Sites](https://img.shields.io/badge/Supported-Sites-9cf.svg?style=flat)](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
 [![Telegram Channel](https://img.shields.io/badge/Telegram-chatbot-blue?style=flat&logo=telegram)](https://t.me/decodersfamily)
 
