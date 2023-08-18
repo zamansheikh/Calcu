@@ -916,7 +916,7 @@ Unlock unique features by utilizing long-press gestures on specific buttons: hol
 Do the same on the '%' button to reveal a remainder. 
 The result display window becomes a powerful tool when long-press on results , it save your result in a colorfull button. 
 Access your saved results with a tap, or remove them by long-pressing the button. 
-Remove all save result by long-pressing 'i' button. Thank you for choosing our app!
+Remove all save result by long-pressing 'i' button. Thank you for choosing my app!
 
 Developer: Zaman Sheikh
 Github: https://github.com/zamansheikh
