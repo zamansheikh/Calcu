@@ -40,6 +40,8 @@ dependencies:
   flutter_svg: ^2.0.7
   fluttertoast:
   flutter_launcher_icons: "^0.13.1"
+  math_expressions: ^2.4.0
+
 
 flutter_launcher_icons:
   android: "launcher_icon"

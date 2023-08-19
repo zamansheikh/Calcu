@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'package:math_expressions/math_expressions.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:calcu/components/calcu_button.dart';
 import 'package:calcu/components/tool_bar.dart';
@@ -15,15 +15,11 @@ class CalcuPage extends StatefulWidget {
 }
 
 class _CalcuPageState extends State<CalcuPage> {
-  double value = 0;
-  var previousValue = '';
-  var currentValue = '';
-  var operator = '';
-  double? result;
-  var str = '';
   bool equalIsClicked = false;
-  List<double> remValue = [];
+  List<String> remValue = [];
   final ScrollController _scrollController = ScrollController();
+  String input = '';
+  String output = '';
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +39,7 @@ class _CalcuPageState extends State<CalcuPage> {
               padding: const EdgeInsets.all(8),
               alignment: Alignment.centerRight,
               width: double.infinity,
-              height: 120,
+              height: 80,
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
                 color: Colors.transparent,
@@ -51,33 +47,20 @@ class _CalcuPageState extends State<CalcuPage> {
               child: TextButton(
                 onPressed: () {},
                 onLongPress: () {
-                  if (operator.isNotEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content:
-                            const Text('Press = Button, Then Try to  Copy!'),
-                        duration: const Duration(milliseconds: 400),
-                        action: SnackBarAction(
-                          label: 'Close',
-                          onPressed: () {},
-                        ),
+                  setState(() {
+                    calculateFunction(input);
+                    remValue.add(output);
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Copied & Saved!'),
+                      duration: const Duration(milliseconds: 400),
+                      action: SnackBarAction(
+                        label: 'Close',
+                        onPressed: () {},
                       ),
-                    );
-                  } else {
-                    setState(() {
-                      remValue.add(double.parse(previousValue));
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Copied & Saved!'),
-                        duration: const Duration(milliseconds: 400),
-                        action: SnackBarAction(
-                          label: 'Close',
-                          onPressed: () {},
-                        ),
-                      ),
-                    );
-                  }
+                    ),
+                  );
                   if (remValue.isNotEmpty) {
                     _scrollController.animateTo(
                       _scrollController.position.maxScrollExtent,
@@ -92,21 +75,58 @@ class _CalcuPageState extends State<CalcuPage> {
                   child: Row(
                     children: [
                       Text(
-                        previousValue,
+                        input,
                         style: AppText.header1
-                            .copyWith(fontSize: 50, color: Colors.white),
+                            .copyWith(fontSize: 40, color: Colors.white),
                       ),
-                      const SizedBox(width: 3),
-                      Text(
-                        operator,
-                        style: AppText.header1
-                            .copyWith(fontSize: 50, color: Colors.red),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(8),
+              alignment: Alignment.centerRight,
+              width: double.infinity,
+              height: 80,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+                color: Colors.transparent,
+              ),
+              child: TextButton(
+                onPressed: () {},
+                onLongPress: () {
+                  setState(() {
+                    calculateFunction(input);
+                    remValue.add(output);
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Press = Button, Then Try to  Copy!'),
+                      duration: const Duration(milliseconds: 400),
+                      action: SnackBarAction(
+                        label: 'Close',
+                        onPressed: () {},
                       ),
-                      const SizedBox(width: 3),
+                    ),
+                  );
+                  if (remValue.isNotEmpty) {
+                    _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 100),
+                      curve: Curves.easeInOut,
+                    );
+                  }
+                },
+                child: SingleChildScrollView(
+                  reverse: (equalIsClicked) ? false : true,
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
                       Text(
-                        currentValue,
+                        output,
                         style: AppText.header1
-                            .copyWith(fontSize: 50, color: Colors.white),
+                            .copyWith(fontSize: 40, color: Colors.white),
                       ),
                     ],
                   ),
@@ -147,22 +167,12 @@ class _CalcuPageState extends State<CalcuPage> {
                           onLongPress: () {},
                           onPressed: () {
                             setState(() {
-                              if (operator.isNotEmpty) {
-                                if (currentValue.contains('.')) {
-                                  currentValue =
-                                      '$currentValue${remValue[index].toInt()}';
-                                } else {
-                                  currentValue =
-                                      currentValue + remValue[index].toString();
-                                }
+                              if (input.contains('.')) {
+                                input += double.parse(remValue[index])
+                                    .toInt()
+                                    .toString();
                               } else {
-                                if (previousValue.contains('.')) {
-                                  previousValue =
-                                      '$previousValue${remValue[index].toInt()}';
-                                } else {
-                                  previousValue = previousValue +
-                                      remValue[index].toString();
-                                }
+                                input += remValue[index];
                               }
                             });
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -193,7 +203,7 @@ class _CalcuPageState extends State<CalcuPage> {
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(8))),
                                 child: Text(
-                                  "${index + 1} : ${remValue[index].toStringAsFixed(2)}",
+                                  "${index + 1} : ${remValue[index]}",
                                   style: TextStyle(
                                       color: (index % 2 == 0)
                                           ? const Color(0xFFFFFFFF)
@@ -282,51 +292,28 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "AC",
                   onPressed: () {
                     setState(() {
-                      equalIsClicked = false;
-                      previousValue = '';
-                      currentValue = '';
-                      operator = '';
-                      str = '';
+                      input = '';
+                      output = '';
                     });
                   },
                 )),
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "-",
+                  buttonName: "()",
                   onPressed: () {
                     setState(() {
-                      if (previousValue.isNotEmpty &&
-                          operator.isNotEmpty & currentValue.isEmpty) {
-                        equalIsClicked = false;
-                        currentValue = '-';
-                      } else if (previousValue.isEmpty) {
-                        equalIsClicked = false;
-                        previousValue = '-';
-                      }
+                      input += '()';
                     });
                   },
                 )),
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "^",
+                  buttonName: "%",
                   onPressed: () {
                     setState(() {
-                      if (previousValue != '-') {
-                        if (currentValue.isEmpty && previousValue.isNotEmpty) {
-                          equalIsClicked = false;
-                          operator = '^';
-                        } else {
-                          if (currentValue.isNotEmpty) {
-                            equalIsClicked = false;
-                            previousValue = calcuFunc(
-                                operator, previousValue, currentValue);
-                            currentValue = '';
-                            operator = '^';
-                          }
-                        }
-                      }
+                      input += '%';
                     });
                   },
                 )),
@@ -336,21 +323,8 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "Del",
                   onPressed: () {
                     setState(() {
-                      if (currentValue.isNotEmpty) {
-                        equalIsClicked = false;
-                        currentValue =
-                            currentValue.substring(0, currentValue.length - 1);
-                      } else {
-                        if (operator.isNotEmpty) {
-                          equalIsClicked = false;
-                          operator = '';
-                        } else {
-                          if (previousValue.isNotEmpty) {
-                            equalIsClicked = false;
-                            previousValue = previousValue.substring(
-                                0, previousValue.length - 1);
-                          }
-                        }
+                      if (input.isNotEmpty) {
+                        input = input.substring(0, input.length - 1);
                       }
                     });
                   },
@@ -363,141 +337,40 @@ class _CalcuPageState extends State<CalcuPage> {
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "x²",
+                  buttonName: "[]²",
                   onPressed: () {
                     setState(() {
-                      if (operator.isNotEmpty) {
-                        if (currentValue.isNotEmpty &&
-                            previousValue.isNotEmpty) {
-                          equalIsClicked = false;
-                          currentValue = (double.parse(currentValue) *
-                                  double.parse(currentValue))
-                              .toString();
-                        }
-                      } else {
-                        //empty
-                        if (currentValue.isEmpty && previousValue.isNotEmpty) {
-                          equalIsClicked = true;
-                          previousValue = (double.parse(previousValue) *
-                                  double.parse(previousValue))
-                              .toString();
-                        }
-                      }
+                      input += '^2';
                     });
                   },
                 )),
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "√",
+                  buttonName: "√.",
                   onPressed: () {
                     setState(() {
-                      if (operator.isNotEmpty) {
-                        if (currentValue.isNotEmpty &&
-                            previousValue.isNotEmpty) {
-                          equalIsClicked = false;
-                          currentValue =
-                              (sqrt(double.parse(currentValue))).toString();
-                        }
-                      } else {
-                        //empty
-                        if (currentValue.isEmpty && previousValue.isNotEmpty) {
-                          equalIsClicked = true;
-                          previousValue =
-                              (sqrt(double.parse(previousValue))).toString();
-                        }
-                      }
+                      input += '√';
                     });
                   },
                 )),
                 Expanded(
-                  child: Stack(
-                    alignment: AlignmentDirectional.center,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 0),
-                        height: 60,
-                        width: 80,
-                        decoration: BoxDecoration(
-                            color: AppColors.spButton,
-                            borderRadius: BorderRadius.circular(16)),
-                        child: TextButton(
-                          onLongPress: () {
-                            setState(() {
-                              if (previousValue != '-') {
-                                if (currentValue.isEmpty &&
-                                    previousValue.isNotEmpty) {
-                                  equalIsClicked = false;
-                                  operator = '|';
-                                } else {
-                                  if (currentValue.isNotEmpty) {
-                                    equalIsClicked = false;
-                                    previousValue = calcuFunc(
-                                        operator, previousValue, currentValue);
-                                    currentValue = '';
-                                    operator = '|';
-                                  }
-                                }
-                              }
-                            });
-                          },
-                          onPressed: () {
-                            setState(() {
-                              if (currentValue.isEmpty &&
-                                  previousValue.isNotEmpty) {
-                                equalIsClicked = true;
-                                previousValue =
-                                    (double.parse(previousValue) / 100)
-                                        .toString();
-                              } else {
-                                if (currentValue.isNotEmpty) {
-                                  equalIsClicked = false;
-                                  currentValue =
-                                      (double.parse(currentValue) / 100)
-                                          .toString();
-                                }
-                              }
-                            });
-                          },
-                          child: Text(
-                            "%",
-                            style: AppText.calc
-                                .copyWith(color: AppColors.textColor),
-                          ),
-                        ),
-                      ),
-                      const Positioned(
-                          right: 25,
-                          top: 17,
-                          child: Text(
-                            "|",
-                            style:
-                                TextStyle(color: Colors.yellow, fontSize: 20),
-                          )),
-                    ],
-                  ),
-                ),
+                    child: CalcuButton(
+                  buttonColor: AppColors.spButton,
+                  buttonName: "|.",
+                  onPressed: () {
+                    setState(() {
+                      input += '|';
+                    });
+                  },
+                )),
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.opButton,
                   buttonName: "÷",
                   onPressed: () {
                     setState(() {
-                      if (previousValue != '-') {
-                        if (currentValue.isEmpty && previousValue.isNotEmpty) {
-                          equalIsClicked = false;
-                          operator = '÷';
-                        } else {
-                          if (currentValue.isNotEmpty) {
-                            equalIsClicked = false;
-                            previousValue = calcuFunc(
-                                operator, previousValue, currentValue);
-                            currentValue = '';
-                            operator = '÷';
-                          }
-                        }
-                      }
+                      input += '÷';
                     });
                   },
                 )),
@@ -512,20 +385,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "7",
                   onPressed: () {
                     setState(() {
-                      if (equalIsClicked) {
-                        previousValue = '.';
-                        equalIsClicked = false;
-                      } else {
-                        operator.isEmpty
-                            ? {
-                                equalIsClicked = false,
-                                previousValue = '${previousValue}7',
-                              }
-                            : {
-                                equalIsClicked = false,
-                                currentValue = '${currentValue}7',
-                              };
-                      }
+                      input += '7';
                     });
                   },
                 )),
@@ -535,20 +395,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "8",
                   onPressed: () {
                     setState(() {
-                      if (equalIsClicked) {
-                        previousValue = '8';
-                        equalIsClicked = false;
-                      } else {
-                        operator.isEmpty
-                            ? {
-                                equalIsClicked = false,
-                                previousValue = '${previousValue}8',
-                              }
-                            : {
-                                equalIsClicked = false,
-                                currentValue = '${currentValue}8',
-                              };
-                      }
+                      input += '8';
                     });
                   },
                 )),
@@ -558,20 +405,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "9",
                   onPressed: () {
                     setState(() {
-                      if (equalIsClicked) {
-                        previousValue = '9';
-                        equalIsClicked = false;
-                      } else {
-                        operator.isEmpty
-                            ? {
-                                equalIsClicked = false,
-                                previousValue = '${previousValue}9',
-                              }
-                            : {
-                                equalIsClicked = false,
-                                currentValue = '${currentValue}9',
-                              };
-                      }
+                      input += '9';
                     });
                   },
                 )),
@@ -581,20 +415,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "x",
                   onPressed: () {
                     setState(() {
-                      if (previousValue != '-') {
-                        equalIsClicked = false;
-                        if (currentValue.isEmpty && previousValue.isNotEmpty) {
-                          operator = 'x';
-                        } else {
-                          if (currentValue.isNotEmpty) {
-                            equalIsClicked = false;
-                            previousValue = calcuFunc(
-                                operator, previousValue, currentValue);
-                            currentValue = '';
-                            operator = 'x';
-                          }
-                        }
-                      }
+                      input += 'x';
                     });
                   },
                 )),
@@ -609,20 +430,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "4",
                   onPressed: () {
                     setState(() {
-                      if (equalIsClicked) {
-                        previousValue = '4';
-                        equalIsClicked = false;
-                      } else {
-                        operator.isEmpty
-                            ? {
-                                equalIsClicked = false,
-                                previousValue = '${previousValue}4',
-                              }
-                            : {
-                                equalIsClicked = false,
-                                currentValue = '${currentValue}4',
-                              };
-                      }
+                      input += '4';
                     });
                   },
                 )),
@@ -632,20 +440,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "5",
                   onPressed: () {
                     setState(() {
-                      if (equalIsClicked) {
-                        previousValue = '5';
-                        equalIsClicked = false;
-                      } else {
-                        operator.isEmpty
-                            ? {
-                                equalIsClicked = false,
-                                previousValue = '${previousValue}5',
-                              }
-                            : {
-                                equalIsClicked = false,
-                                currentValue = '${currentValue}5',
-                              };
-                      }
+                      input += '5';
                     });
                   },
                 )),
@@ -655,20 +450,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "6",
                   onPressed: () {
                     setState(() {
-                      if (equalIsClicked) {
-                        previousValue = '6';
-                        equalIsClicked = false;
-                      } else {
-                        operator.isEmpty
-                            ? {
-                                equalIsClicked = false,
-                                previousValue = '${previousValue}6',
-                              }
-                            : {
-                                equalIsClicked = false,
-                                currentValue = '${currentValue}6',
-                              };
-                      }
+                      input += '6';
                     });
                   },
                 )),
@@ -678,20 +460,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "-",
                   onPressed: () {
                     setState(() {
-                      if (previousValue != '-') {
-                        if (currentValue.isEmpty && previousValue.isNotEmpty) {
-                          equalIsClicked = false;
-                          operator = '-';
-                        } else {
-                          if (currentValue.isNotEmpty) {
-                            equalIsClicked = false;
-                            previousValue = calcuFunc(
-                                operator, previousValue, currentValue);
-                            currentValue = '';
-                            operator = '-';
-                          }
-                        }
-                      }
+                      input += '-';
                     });
                   },
                 )),
@@ -706,20 +475,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "1",
                   onPressed: () {
                     setState(() {
-                      if (equalIsClicked) {
-                        previousValue = '1';
-                        equalIsClicked = false;
-                      } else {
-                        operator.isEmpty
-                            ? {
-                                equalIsClicked = false,
-                                previousValue = '${previousValue}1',
-                              }
-                            : {
-                                equalIsClicked = false,
-                                currentValue = '${currentValue}1',
-                              };
-                      }
+                      input += '1';
                     });
                   },
                 )),
@@ -729,20 +485,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "2",
                   onPressed: () {
                     setState(() {
-                      if (equalIsClicked) {
-                        previousValue = '2';
-                        equalIsClicked = false;
-                      } else {
-                        operator.isEmpty
-                            ? {
-                                equalIsClicked = false,
-                                previousValue = '${previousValue}2',
-                              }
-                            : {
-                                equalIsClicked = false,
-                                currentValue = '${currentValue}2',
-                              };
-                      }
+                      input += '2';
                     });
                   },
                 )),
@@ -752,20 +495,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "3",
                   onPressed: () {
                     setState(() {
-                      if (equalIsClicked) {
-                        previousValue = '3';
-                        equalIsClicked = false;
-                      } else {
-                        operator.isEmpty
-                            ? {
-                                equalIsClicked = false,
-                                previousValue = '${previousValue}3',
-                              }
-                            : {
-                                equalIsClicked = false,
-                                currentValue = '${currentValue}3',
-                              };
-                      }
+                      input += '3';
                     });
                   },
                 )),
@@ -775,20 +505,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "+",
                   onPressed: () {
                     setState(() {
-                      if (previousValue != '-') {
-                        if (currentValue.isEmpty && previousValue.isNotEmpty) {
-                          equalIsClicked = false;
-                          operator = '+';
-                        } else {
-                          if (currentValue.isNotEmpty) {
-                            equalIsClicked = false;
-                            previousValue = calcuFunc(
-                                operator, previousValue, currentValue);
-                            currentValue = '';
-                            operator = '+';
-                          }
-                        }
-                      }
+                      input += '+';
                     });
                   },
                 )),
@@ -804,20 +521,7 @@ class _CalcuPageState extends State<CalcuPage> {
                       buttonName: "0",
                       onPressed: () {
                         setState(() {
-                          if (equalIsClicked) {
-                            previousValue = '0';
-                            equalIsClicked = false;
-                          } else {
-                            operator.isEmpty
-                                ? {
-                                    equalIsClicked = false,
-                                    previousValue = '${previousValue}0',
-                                  }
-                                : {
-                                    equalIsClicked = false,
-                                    currentValue = '${currentValue}0',
-                                  };
-                          }
+                          input += '0';
                         });
                       },
                     )),
@@ -827,42 +531,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: ".",
                   onPressed: () {
                     setState(() {
-                      if (equalIsClicked) {
-                        previousValue = '0.';
-                        equalIsClicked = false;
-                      } else {
-                        operator.isEmpty
-                            ? {
-                                if (!previousValue.contains("."))
-                                  {
-                                    if (previousValue.isEmpty)
-                                      {
-                                        equalIsClicked = false,
-                                        previousValue = '0.',
-                                      }
-                                    else
-                                      {
-                                        equalIsClicked = false,
-                                        previousValue = '$previousValue.',
-                                      }
-                                  }
-                              }
-                            : {
-                                if (!currentValue.contains("."))
-                                  {
-                                    if (currentValue.isEmpty)
-                                      {
-                                        equalIsClicked = false,
-                                        currentValue = '0.',
-                                      }
-                                    else
-                                      {
-                                        equalIsClicked = false,
-                                        currentValue = '$currentValue.',
-                                      }
-                                  }
-                              };
-                      }
+                      input += '.';
                     });
                   },
                 )),
@@ -877,32 +546,15 @@ class _CalcuPageState extends State<CalcuPage> {
                       borderRadius: BorderRadius.circular(16)),
                   child: TextButton(
                     onPressed: () {
-                      setState(
-                        () {
-                          if (currentValue.isNotEmpty) {
-                            if (operator.isNotEmpty) {
-                              equalIsClicked = true;
-                              previousValue = calcuFunc(
-                                  operator, previousValue, currentValue);
-                              operator = '';
-                              currentValue = '';
-                            }
-                          }
-                        },
-                      );
+                      setState(() {
+                        calculateFunction(input);
+                        output;
+                      });
                     },
                     onLongPress: () {
                       setState(() {
-                        if (currentValue.isEmpty) {
-                          if (operator.isNotEmpty) {
-                          } else {
-                            if (previousValue.isNotEmpty) {
-                              equalIsClicked = true;
-                              previousValue = double.parse(previousValue)
-                                  .toStringAsFixed(3);
-                            }
-                          }
-                        }
+                        calculateFunction(input);
+                        output = double.parse(output).toStringAsFixed(3);
                       });
                     },
                     child: Text(
@@ -920,24 +572,26 @@ class _CalcuPageState extends State<CalcuPage> {
     );
   }
 
-  calcuFunc(var op, a, b) {
-    var valA = double.parse(a);
-    var valB = double.parse(b);
-    switch (op) {
-      case '÷':
-        return (valA / valB).toString();
-      case 'x':
-        return (valA * valB).toString();
-      case '-':
-        return (valA - valB).toString();
-      case '+':
-        return (valA + valB).toString();
-      case '|':
-        return (valA % valB).toString();
-      case '^':
-        return (pow(valA, valB)).toString();
-      default:
-        return 'Error';
-    }
+  void calculateFunction(String str) {
+    str = str.replaceAll('√', 'sqrt');
+
+    
+    //replace for remiander
+    str = str.replaceAll('Rem', '   what is this?');
+    
+    str = str.replaceAll('x', '*');
+    str = str.replaceAll('÷', '/');
+    str = str.replaceAll('%', '/100');
+
+    Parser p = Parser();
+    Expression exp = p.parse(str);
+    ContextModel cm = ContextModel();
+
+    // Evaluate the expression
+    double result = exp.evaluate(EvaluationType.REAL, cm) as double;
+
+    setState(() {
+      output = result.toString();
+    });
   }
 }
