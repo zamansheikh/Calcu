@@ -34,8 +34,8 @@ class _CalcuPageState extends State<CalcuPage> {
         child: Column(
           children: [
             const Divider(
-              indent: 8,
-              endIndent: 8,
+              indent: 0,
+              endIndent: 0,
               height: 0,
               thickness: 2,
             ),
@@ -136,25 +136,15 @@ class _CalcuPageState extends State<CalcuPage> {
                       scrollDirection: Axis.horizontal,
                       controller: _scrollController,
                       itemCount: remValue.length,
-                      separatorBuilder: (context, index) => const Divider(),
+                      separatorBuilder: (context, index) => Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        color: Colors.white,
+                        width: 1,
+                        child: const Divider(),
+                      ),
                       itemBuilder: (context, index) {
                         return TextButton(
-                          onLongPress: () {
-                            setState(() {
-                              remValue.removeAt(index);
-                            });
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                duration: const Duration(milliseconds: 400),
-                                content: const Text('Deleted!'),
-                                action: SnackBarAction(
-                                  label: 'Close',
-                                  onPressed: () {},
-                                ),
-                              ),
-                            );
-                          },
+                          onLongPress: () {},
                           onPressed: () {
                             setState(() {
                               if (operator.isNotEmpty) {
@@ -189,12 +179,63 @@ class _CalcuPageState extends State<CalcuPage> {
                           key: (index == remValue.length - 1)
                               ? const Key('lastItem')
                               : null,
-                          child: Text(
-                            remValue[index].toStringAsFixed(2),
-                            style: TextStyle(
-                                color: (index % 2 == 0)
-                                    ? const Color(0xFFFFFFFF)
-                                    : const Color(0xFFFF1100)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                height: 40,
+                                decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(.2),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(8))),
+                                child: Text(
+                                  "${index + 1} : ${remValue[index].toStringAsFixed(2)}",
+                                  style: TextStyle(
+                                      color: (index % 2 == 0)
+                                          ? const Color(0xFFFFFFFF)
+                                          : const Color(0xFFFF1100)),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 3),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  height: 35,
+                                  decoration: BoxDecoration(
+                                      color: Colors.red.withOpacity(.8),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(100))),
+                                  child: IconButton(
+                                    visualDensity: VisualDensity.compact,
+                                    onPressed: () {
+                                      setState(() {
+                                        remValue.removeAt(index);
+                                      });
+
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          duration:
+                                              const Duration(milliseconds: 400),
+                                          content: const Text('Deleted!'),
+                                          action: SnackBarAction(
+                                            label: 'Close',
+                                            onPressed: () {},
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.clear),
+                                    color: Colors.white,
+                                    iconSize: 16,
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         );
                       },
@@ -206,26 +247,23 @@ class _CalcuPageState extends State<CalcuPage> {
                           remValue.clear();
                         });
                         Fluttertoast.showToast(
-                          msg: 'All DELETED',
+                          msg: 'All Deleted',
                           toastLength: Toast.LENGTH_SHORT,
                           gravity: ToastGravity.BOTTOM,
                           backgroundColor: Colors.grey[800],
                           textColor: Colors.white,
                         );
                       },
-                      onPressed: _showDialog,
-
-                      // () {
-                      //   Fluttertoast.showToast(
-                      //     msg:
-                      //         'made by Zaman Sheikh\nfb.com/zamansheikh.404\nv2.5',
-                      //     toastLength: Toast.LENGTH_LONG,
-                      //     gravity: ToastGravity.BOTTOM,
-                      //     backgroundColor: Colors.grey[800],
-                      //     textColor: Colors.white,
-                      //   );
-                      // },
-                      child: const Icon(Icons.info)),
+                      onPressed: () {
+                        Fluttertoast.showToast(
+                          msg: 'Long-Press to delete all',
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.BOTTOM,
+                          backgroundColor: Colors.grey[800],
+                          textColor: Colors.white,
+                        );
+                      },
+                      child: const Icon(Icons.delete_forever_rounded)),
                 ],
               ),
             ),
@@ -901,27 +939,5 @@ class _CalcuPageState extends State<CalcuPage> {
       default:
         return 'Error';
     }
-  }
-
-  void _showDialog() {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const AlertDialog(
-            backgroundColor: AppColors.calcuBackground,
-            title: Text("About App"),
-            content: Text(
-                """This calculator offers more than just simplicity—it brings innovation to your fingertips. 
-Unlock unique features by utilizing long-press gestures on specific buttons: hold down the '=' button for a precise 3-decimal result.
-Do the same on the '%' button to reveal a remainder. 
-The result display window becomes a powerful tool when long-press on results , it save your result in a colorfull button. 
-Access your saved results with a tap, or remove them by long-pressing the button. 
-Remove all save result by long-pressing 'i' button. Thank you for choosing my app!
-
-Developer: Zaman Sheikh
-Github: https://github.com/zamansheikh
-Version: 2.9"""),
-          );
-        });
   }
 }
