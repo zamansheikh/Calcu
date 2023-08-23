@@ -20,6 +20,7 @@ class _CalcuPageState extends State<CalcuPage> {
   final ScrollController _scrollController = ScrollController();
   String input = '';
   String output = '';
+  List<int> parenthesis = [0, 0];
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +71,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   }
                 },
                 child: SingleChildScrollView(
-                  reverse: (equalIsClicked) ? false : true,
+                  reverse: true,
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
@@ -119,7 +120,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   }
                 },
                 child: SingleChildScrollView(
-                  reverse: (equalIsClicked) ? false : true,
+                  reverse: false,
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
@@ -303,7 +304,27 @@ class _CalcuPageState extends State<CalcuPage> {
                   buttonName: "()",
                   onPressed: () {
                     setState(() {
-                      input += '()';
+                      for (int i = 0; i < input.length; i++) {
+                        if (input[i] == '(') {
+                          parenthesis[0]++;
+                        } else if (input[i] == ')') {
+                          parenthesis[1]++;
+                        }
+                      }
+                      if (parenthesis[0] == parenthesis[1]) {
+                        input += '(';
+                      } else if (parenthesis[0] > parenthesis[1]) {
+                        input += ')';
+                      } else {
+                        input += '(';
+                      }
+                      parenthesis[0] = 0;
+                      parenthesis[1] = 0;
+                    });
+                  },
+                  onLongPressed: () {
+                    setState(() {
+                      input += '(';
                     });
                   },
                 )),
@@ -337,17 +358,17 @@ class _CalcuPageState extends State<CalcuPage> {
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "[]²",
+                  buttonName: "[]^",
                   onPressed: () {
                     setState(() {
-                      input += '^2';
+                      input += '^';
                     });
                   },
                 )),
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "√.",
+                  buttonName: "√()",
                   onPressed: () {
                     setState(() {
                       input += '√';
@@ -357,7 +378,7 @@ class _CalcuPageState extends State<CalcuPage> {
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "|.",
+                  buttonName: "|",
                   onPressed: () {
                     setState(() {
                       input += '|';
@@ -573,25 +594,67 @@ class _CalcuPageState extends State<CalcuPage> {
   }
 
   void calculateFunction(String str) {
-    str = str.replaceAll('√', 'sqrt');
-
-    
-    //replace for remiander
-    str = str.replaceAll('Rem', '   what is this?');
-    
+    str = findAndReplace(str, 0);
     str = str.replaceAll('x', '*');
     str = str.replaceAll('÷', '/');
-    str = str.replaceAll('%', '/100');
+    str = str.replaceAll('|', '%');
 
     Parser p = Parser();
-    Expression exp = p.parse(str);
-    ContextModel cm = ContextModel();
+    try {
+      Expression exp = p.parse(str);
+      ContextModel cm = ContextModel();
+      double result = exp.evaluate(EvaluationType.REAL, cm) as double;
+      setState(() {
+        output = result.toString();
+      });
+    } catch (e) {
+      output = 'Wrong Input!';
+    }
+  }
 
-    // Evaluate the expression
-    double result = exp.evaluate(EvaluationType.REAL, cm) as double;
-
-    setState(() {
-      output = result.toString();
-    });
+  String findAndReplace(String value, int index) {
+    List<String> str = ['√(', '√', '%'];
+    if (index >= str.length) {
+      return value;
+    }
+    num a = 0;
+    int revStart = 0, revEnd = 0;
+    String revValu = '';
+    for (int i = 0; i < value.length; i++) {
+      if (value.substring(i).startsWith(str[index])) {
+        int j = 0;
+        if (str[index] != '%') {
+          for (j = i + str[index].length; j < value.length; j++) {
+            if (int.tryParse(value[j]) != null) {
+              a *= 10;
+              a += int.tryParse(value[j])!;
+            } else {
+              break;
+            }
+          }
+        } else if (str[index] == '%') {
+          revEnd = i + str[index].length;
+          for (j = i - str[index].length; j > -1; j--) {
+            if (int.tryParse(value[j]) != null) {
+              revValu = int.tryParse(value[j])!.toString() + revValu;
+            } else {
+              break;
+            }
+          }
+        }
+        if (str[index] != '%') {
+          if (str[index] == '√') {
+            value = value.replaceRange(i, j, 'sqrt($a)');
+          } else if (str[index] == '√(') {
+            value = value.replaceRange(i, j, 'sqrt($a');
+          }
+        } else if (str[index] == '%') {
+          revStart = j + 1;
+          value = value.replaceRange(revStart, revEnd, '($revValu/100)');
+        }
+        a = 0;
+      }
+    }
+    return findAndReplace(value, index + 1);
   }
 }

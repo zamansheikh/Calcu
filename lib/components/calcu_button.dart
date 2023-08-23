@@ -6,12 +6,14 @@ class CalcuButton extends StatelessWidget {
   final String buttonName;
   final Color buttonColor;
   final Function() onPressed;
+  final Function()? onLongPressed;
 
   const CalcuButton(
       {super.key,
       required this.buttonName,
       required this.buttonColor,
-      required this.onPressed});
+      required this.onPressed,
+      this.onLongPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +25,7 @@ class CalcuButton extends StatelessWidget {
           color: buttonColor, borderRadius: BorderRadius.circular(16)),
       child: TextButton(
         onPressed: onPressed,
+        onLongPress: onLongPressed,
         child: Text(
           buttonName,
           style: AppText.calc.copyWith(color: AppColors.textColor),
