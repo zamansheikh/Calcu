@@ -41,16 +41,29 @@ class _CalcuPageState extends State<CalcuPage> {
     await pref.setStringList('remvalu', remValue);
   }
 
+  themeLoadData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    bool? isDarkMode = pref.getBool('isDark');
+    isDark = isDarkMode ?? true;
+  }
+
+  themeData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    await pref.setBool('isDark', isDark);
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
     readData();
-    isDark;
+    themeLoadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: AppStrings.fontFamily,
         scaffoldBackgroundColor:
@@ -58,7 +71,30 @@ class _CalcuPageState extends State<CalcuPage> {
         brightness: isDark ? Brightness.dark : Brightness.light,
       ),
       home: Scaffold(
-        appBar: const ToolBar(appBarName: AppStrings.calcu),
+        appBar: AppBar(
+            toolbarHeight: 40,
+            backgroundColor: isDark
+                ? AppColors.calcuBackground
+                : Colors.white.withOpacity(.5),
+            elevation: 0,
+            centerTitle: true,
+            leading: TextButton(
+                onPressed: _showDialog, child: const Icon(Icons.info)),
+            title: Text(
+              AppStrings.appBarName,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            ),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      isDark = isDark ? false : true;
+                    });
+                  },
+                  icon: Icon((isDark)
+                      ? Icons.light_mode_rounded
+                      : Icons.dark_mode_sharp))
+            ]),
         body: Padding(
           padding:
               const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 4),
@@ -696,5 +732,22 @@ class _CalcuPageState extends State<CalcuPage> {
       }
     }
     return findAndReplace(value, index + 1);
+  }
+
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor:
+              isDark ? AppColors.calcuBackground : Colors.white.withOpacity(.5),
+          title: const Text("About App"),
+          content: Text(
+            AppStrings.infoText,
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
+        );
+      },
+    );
   }
 }

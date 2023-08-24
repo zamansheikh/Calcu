@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'config/app_routes.dart';
 import 'config/app_strings.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -15,7 +14,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.calcu,
       routes: AppRoutes.pages,

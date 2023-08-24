@@ -1,7 +1,8 @@
 class AppStrings {
   static const fontFamily = 'Urbanist';
   static const calcu = 'Calcu';
-  static const infoText ="""This calculator offers more than just simplicity—it brings innovation to your fingertips. 
+  static const infoText =
+      """This calculator offers more than just simplicity—it brings innovation to your fingertips. 
 Unlock unique features by utilizing long-press gestures on specific buttons: hold down the '=' button for a precise 3-decimal result.
 Do the same on the '%' button to reveal a remainder. 
 The result display window becomes a powerful tool when long-press on results , it save your result in a colorfull button. 
@@ -11,5 +12,5 @@ Remove all save result by long-pressing 'i' button. Thank you for choosing my ap
 Developer: Zaman Sheikh
 Github: https://github.com/zamansheikh
 Version: 2.9""";
-  
+  static const appBarName = 'Calcu';
 }
