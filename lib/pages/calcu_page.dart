@@ -2,7 +2,6 @@ import 'package:calcu/config/app_variable.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:calcu/components/calcu_button.dart';
-import 'package:calcu/components/tool_bar.dart';
 import 'package:calcu/config/app_strings.dart';
 import 'package:calcu/styles/app_colors.dart';
 import 'package:calcu/styles/app_text.dart';
@@ -120,7 +119,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   onLongPress: () {
                     setState(() {
                       calculateFunction(input);
-                      remValue.add(output);
+                      output != 'Wrong Input!' ? remValue.add(output) : output;
                       writeData();
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -170,7 +169,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   onLongPress: () {
                     setState(() {
                       calculateFunction(input);
-                      remValue.add(output);
+                      output != 'Wrong Input!' ? remValue.add(output) : output;
                       writeData();
                     });
                     ScaffoldMessenger.of(context).showSnackBar(

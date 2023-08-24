@@ -1,8 +1,5 @@
-import 'package:calcu/config/app_variable.dart';
-import 'package:calcu/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'config/app_routes.dart';
-import 'config/app_strings.dart';
 
 void main() {
   runApp(const MyApp());
