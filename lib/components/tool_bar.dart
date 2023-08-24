@@ -1,5 +1,7 @@
 import 'package:calcu/config/app_strings.dart';
+import 'package:calcu/config/app_variable.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../styles/app_colors.dart';
 
 class ToolBar extends StatefulWidget implements PreferredSizeWidget {
@@ -16,21 +18,44 @@ class ToolBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _ToolBarState extends State<ToolBar> {
   @override
+  void initState() {
+    super.initState();
+    readData();
+  }
+
+  readData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    bool? isDarkMode = pref.getBool('isDark');
+    isDark = isDarkMode ?? true;
+  }
+
+  writeData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    await pref.setBool('isDark', isDark);
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AppBar(
-        backgroundColor: AppColors.calcuBackground,
+        backgroundColor:
+            isDark ? AppColors.calcuBackground : Colors.white.withOpacity(.5),
         elevation: 0,
         centerTitle: true,
         leading:
             TextButton(onPressed: _showDialog, child: const Icon(Icons.info)),
-        //leadingWidth: 70,
-
         title: Text(
           widget.appBarName,
         ),
         actions: [
           IconButton(
-              onPressed: () {}, icon: const Icon(Icons.light_mode_rounded))
+              onPressed: () {
+                setState(() {
+                  isDark = isDark ? false : true;
+                });
+              },
+              icon: Icon(
+                  (isDark) ? Icons.light_mode_rounded : Icons.dark_mode_sharp))
         ]);
   }
 

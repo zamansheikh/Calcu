@@ -41,6 +41,7 @@ dependencies:
   fluttertoast:
   flutter_launcher_icons: "^0.13.1"
   math_expressions: ^2.4.0
+  shared_preferences: ^2.2.0
 
 
 flutter_launcher_icons:

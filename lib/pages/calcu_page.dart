@@ -1,3 +1,4 @@
+import 'package:calcu/config/app_variable.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:calcu/components/calcu_button.dart';
@@ -6,6 +7,8 @@ import 'package:calcu/config/app_strings.dart';
 import 'package:calcu/styles/app_colors.dart';
 import 'package:calcu/styles/app_text.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 
 class CalcuPage extends StatefulWidget {
   const CalcuPage({super.key});
@@ -21,6 +24,28 @@ class _CalcuPageState extends State<CalcuPage> {
   String input = '';
   String output = '';
   List<int> parenthesis = [0, 0];
+
+  readData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    List<String>? remValues = pref.getStringList('remvalu');
+
+    setState(() {
+      if (remValues != null) {
+        remValue = remValues;
+      }
+    });
+  }
+
+  writeData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    await pref.setStringList('remvalu', remValue);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    readData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +66,11 @@ class _CalcuPageState extends State<CalcuPage> {
               alignment: Alignment.centerRight,
               width: double.infinity,
               height: 80,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
-                color: Colors.transparent,
+                color: (isDark)
+                    ? Colors.transparent
+                    : Colors.white.withOpacity(.5),
               ),
               child: TextButton(
                 onPressed: () {},
@@ -51,6 +78,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   setState(() {
                     calculateFunction(input);
                     remValue.add(output);
+                    writeData();
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -100,6 +128,7 @@ class _CalcuPageState extends State<CalcuPage> {
                   setState(() {
                     calculateFunction(input);
                     remValue.add(output);
+                    writeData();
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -188,7 +217,7 @@ class _CalcuPageState extends State<CalcuPage> {
                             );
                           },
                           key: (index == remValue.length - 1)
-                              ? const Key('lastItem')
+                              ? const Key('lastItem.')
                               : null,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -204,7 +233,7 @@ class _CalcuPageState extends State<CalcuPage> {
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(8))),
                                 child: Text(
-                                  "${index + 1} : ${remValue[index]}",
+                                  "${index + 1} : ${double.parse(remValue[index]).toStringAsFixed(2)}.",
                                   style: TextStyle(
                                       color: (index % 2 == 0)
                                           ? const Color(0xFFFFFFFF)
@@ -225,6 +254,7 @@ class _CalcuPageState extends State<CalcuPage> {
                                     onPressed: () {
                                       setState(() {
                                         remValue.removeAt(index);
+                                        writeData();
                                       });
 
                                       ScaffoldMessenger.of(context)
@@ -256,6 +286,7 @@ class _CalcuPageState extends State<CalcuPage> {
                       onLongPress: () {
                         setState(() {
                           remValue.clear();
+                          writeData();
                         });
                         Fluttertoast.showToast(
                           msg: 'All Deleted',
