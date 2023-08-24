@@ -15,12 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        fontFamily: AppStrings.fontFamily,
-        scaffoldBackgroundColor:
-            isDark ? AppColors.calcuBackground : Colors.white,
-        brightness: isDark ? Brightness.dark : Brightness.light,
-      ),
+      
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.calcu,
       routes: AppRoutes.pages,

@@ -46,6 +46,7 @@ class _ToolBarState extends State<ToolBar> {
             TextButton(onPressed: _showDialog, child: const Icon(Icons.info)),
         title: Text(
           widget.appBarName,
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
         ),
         actions: [
           IconButton(
@@ -63,10 +64,14 @@ class _ToolBarState extends State<ToolBar> {
     showDialog(
       context: context,
       builder: (context) {
-        return const AlertDialog(
-          backgroundColor: AppColors.calcuBackground,
-          title: Text("About App"),
-          content: Text(AppStrings.infoText),
+        return AlertDialog(
+          backgroundColor:
+              isDark ? AppColors.calcuBackground : Colors.white.withOpacity(.5),
+          title: const Text("About App"),
+          content: Text(
+            AppStrings.infoText,
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
         );
       },
     );
