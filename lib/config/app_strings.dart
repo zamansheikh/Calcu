@@ -11,6 +11,6 @@ Remove all save result by long-pressing 'i' button. Thank you for choosing my ap
 
 Developer: Zaman Sheikh
 Github: https://github.com/zamansheikh
-Version: 2.9""";
+Version: 3.0""";
   static const appBarName = 'Calcu';
 }

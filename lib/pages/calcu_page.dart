@@ -66,7 +66,7 @@ class _CalcuPageState extends State<CalcuPage> {
       theme: ThemeData(
         fontFamily: AppStrings.fontFamily,
         scaffoldBackgroundColor:
-            isDark ? AppColors.calcuBackground : Colors.white.withOpacity(.5),
+            isDark ? AppColors.calcuBackground : AppColors.calcuBackgroundLight,
         brightness: isDark ? Brightness.dark : Brightness.light,
       ),
       home: Scaffold(
@@ -74,32 +74,39 @@ class _CalcuPageState extends State<CalcuPage> {
             toolbarHeight: 40,
             backgroundColor: isDark
                 ? AppColors.calcuBackground
-                : Colors.white.withOpacity(.5),
+                : AppColors.calcuBackgroundLight,
             elevation: 0,
             centerTitle: true,
             leading: TextButton(
-                onPressed: _showDialog, child: const Icon(Icons.info)),
+                onPressed: _showDialog,
+                child: Icon(
+                  Icons.info,
+                  color: isDark ? Colors.white : Colors.black,
+                )),
             title: Text(
               AppStrings.appBarName,
               style: TextStyle(color: isDark ? Colors.white : Colors.black),
             ),
             actions: [
               IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isDark = isDark ? false : true;
-                    });
-                  },
-                  icon: Icon((isDark)
-                      ? Icons.light_mode_rounded
-                      : Icons.dark_mode_sharp))
+                onPressed: () {
+                  setState(() {
+                    isDark = isDark ? false : true;
+                  });
+                },
+                icon: Icon((isDark)
+                    ? Icons.light_mode_rounded
+                    : Icons.dark_mode_sharp),
+                color: isDark ? Colors.white : Colors.black,
+              )
             ]),
         body: Padding(
           padding:
               const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 4),
           child: Column(
             children: [
-              const Divider(
+              Divider(
+                color: !isDark ? null : Colors.white.withOpacity(.5),
                 indent: 0,
                 endIndent: 0,
                 height: 0,
@@ -147,8 +154,9 @@ class _CalcuPageState extends State<CalcuPage> {
                       children: [
                         Text(
                           input,
-                          style: AppText.header1
-                              .copyWith(fontSize: 40, color: Colors.white),
+                          style: AppText.header1.copyWith(
+                              fontSize: 40,
+                              color: isDark ? Colors.white : Colors.black),
                         ),
                       ],
                     ),
@@ -198,8 +206,9 @@ class _CalcuPageState extends State<CalcuPage> {
                       children: [
                         Text(
                           output,
-                          style: AppText.header1
-                              .copyWith(fontSize: 40, color: Colors.white),
+                          style: AppText.header1.copyWith(
+                              fontSize: 40,
+                              color: isDark ? Colors.white : Colors.black),
                         ),
                       ],
                     ),
@@ -207,7 +216,8 @@ class _CalcuPageState extends State<CalcuPage> {
                 ),
               ),
               const Spacer(),
-              const Divider(
+              Divider(
+                color: isDark ? null : Colors.black.withOpacity(.5),
                 indent: 12,
                 endIndent: 12,
                 height: 0,
@@ -218,7 +228,9 @@ class _CalcuPageState extends State<CalcuPage> {
                 alignment: Alignment.centerLeft,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  color: Colors.white.withOpacity(.08),
+                  color: isDark
+                      ? Colors.white.withOpacity(.08)
+                      : Colors.black.withOpacity(.08),
                 ),
                 height: 50,
                 width: MediaQuery.of(context).size.width,
@@ -231,7 +243,7 @@ class _CalcuPageState extends State<CalcuPage> {
                         itemCount: remValue.length,
                         separatorBuilder: (context, index) => Container(
                           margin: const EdgeInsets.symmetric(vertical: 10),
-                          color: Colors.white,
+                          color: isDark ? Colors.white : Colors.black,
                           width: 1,
                           child: const Divider(),
                         ),
@@ -278,9 +290,9 @@ class _CalcuPageState extends State<CalcuPage> {
                                   child: Text(
                                     "${index + 1} : ${double.parse(remValue[index]).toStringAsFixed(2)}.",
                                     style: TextStyle(
-                                        color: (index % 2 == 0)
-                                            ? const Color(0xFFFFFFFF)
-                                            : const Color(0xFFFF1100)),
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black),
                                   ),
                                 ),
                                 Padding(
@@ -348,11 +360,15 @@ class _CalcuPageState extends State<CalcuPage> {
                             textColor: Colors.white,
                           );
                         },
-                        child: const Icon(Icons.delete_forever_rounded)),
+                        child: Icon(
+                          Icons.delete_forever_rounded,
+                          color: isDark ? Colors.white : Colors.black,
+                        )),
                   ],
                 ),
               ),
-              const Divider(
+              Divider(
+                color: isDark ? null : Colors.black.withOpacity(.5),
                 indent: 12,
                 endIndent: 12,
                 height: 0,
@@ -637,7 +653,9 @@ class _CalcuPageState extends State<CalcuPage> {
                     height: 60,
                     width: 80,
                     decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(.7),
+                        color: isDark
+                            ? Colors.white.withOpacity(.7)
+                            : Colors.black.withOpacity(.7),
                         borderRadius: BorderRadius.circular(16)),
                     child: TextButton(
                       onPressed: () {
@@ -654,8 +672,9 @@ class _CalcuPageState extends State<CalcuPage> {
                       },
                       child: Text(
                         "=",
-                        style: AppText.calc
-                            .copyWith(color: Colors.black, fontSize: 35),
+                        style: AppText.calc.copyWith(
+                            color: isDark ? Colors.black : Colors.white,
+                            fontSize: 35),
                       ),
                     ),
                   )),
@@ -738,9 +757,13 @@ class _CalcuPageState extends State<CalcuPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor:
-              isDark ? AppColors.calcuBackground : Colors.white.withOpacity(.5),
-          title: const Text("About App"),
+          backgroundColor: isDark
+              ? AppColors.calcuBackground
+              : AppColors.calcuBackgroundLight,
+          title: Text(
+            "About App",
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
           content: Text(
             AppStrings.infoText,
             style: TextStyle(color: isDark ? Colors.white : Colors.black),

@@ -15,4 +15,10 @@ class AppColors {
   static const opButton = Color(0xFF0060E5);
   static const spButton = Color(0xFF363E4C);
   static const textColor = Color(0xFFCBE1FF);
+
+  static const calcuBackgroundLight = Color.fromARGB(255, 210, 209, 209);
+  static const numButtonLight = Color(0xFFE6E6E6);
+  static const opButtonLight = Color(0xFF0060E5);
+  static const spButtonLight = Color(0xFFD9D9D9);
+  static const textColorLight = Color(0xFF333333);
 }
