@@ -7,7 +7,6 @@ import 'package:calcu/styles/app_colors.dart';
 import 'package:calcu/styles/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
 
 class CalcuPage extends StatefulWidget {
   const CalcuPage({super.key});
@@ -17,9 +16,9 @@ class CalcuPage extends StatefulWidget {
 }
 
 class _CalcuPageState extends State<CalcuPage> {
+  final ScrollController _scrollController = ScrollController();
   bool equalIsClicked = false;
   List<String> remValue = [];
-  final ScrollController _scrollController = ScrollController();
   String input = '';
   String output = '';
   List<int> parenthesis = [0, 0];
@@ -183,7 +182,7 @@ class _CalcuPageState extends State<CalcuPage> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content:
-                            const Text('Press = Button, Then Try to  Copy!'),
+                            const Text('Result Saved'),
                         duration: const Duration(milliseconds: 400),
                         action: SnackBarAction(
                           label: 'Close',
@@ -429,17 +428,30 @@ class _CalcuPageState extends State<CalcuPage> {
                     },
                   )),
                   Expanded(
-                      child: CalcuButton(
-                    buttonColor: AppColors.spButton,
-                    buttonName: "Del",
-                    onPressed: () {
-                      setState(() {
-                        if (input.isNotEmpty) {
-                          input = input.substring(0, input.length - 1);
-                        }
-                      });
-                    },
-                  )),
+                    child: InkWell(
+                      radius: 16,
+                      borderRadius: BorderRadius.circular(16),
+                      child: SizedBox(
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          // height: 60,
+                          // width: 80,
+                          decoration: BoxDecoration(
+                              color: AppColors.spButton,
+                              borderRadius: BorderRadius.circular(16)),
+                          child: const Icon(Icons.backspace),
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          if (input.isNotEmpty) {
+                            input = input.substring(0, input.length - 1);
+                          }
+                        });
+                      },
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
