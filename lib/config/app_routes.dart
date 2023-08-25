@@ -6,3 +6,4 @@ class AppRoutes {
   };
   static const calcu = '/calcu';
 }
+ 
