@@ -116,16 +116,16 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {},
                 onLongPress: () {
                   methodController.clickOnResult();
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(
-                  //     content: const Text('Result Saved'),
-                  //     duration: const Duration(milliseconds: 400),
-                  //     action: SnackBarAction(
-                  //       label: 'Close',
-                  //       onPressed: () {},
-                  //     ),
-                  //   ),
-                  // );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Result Saved'),
+                      duration: const Duration(milliseconds: 400),
+                      action: SnackBarAction(
+                        label: 'Close',
+                        onPressed: () {},
+                      ),
+                    ),
+                  );
                   methodController.scrollControllerFunc();
                 },
                 child: SingleChildScrollView(
