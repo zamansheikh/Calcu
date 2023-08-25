@@ -35,6 +35,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  get:
   flutter:
     sdk: flutter
   flutter_svg: ^2.0.7

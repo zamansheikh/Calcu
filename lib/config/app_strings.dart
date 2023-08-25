@@ -13,4 +13,6 @@ Developer: Zaman Sheikh
 Github: https://github.com/zamansheikh
 Version: 3.0""";
   static const appBarName = 'Calcu';
+
+  static const buttonHight = 60;
 }
