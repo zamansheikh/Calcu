@@ -17,7 +17,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       // ignore: void_checks
-      initialBinding: BindingsBuilder(() => Get.put(ThemeController())),
+      initialBinding:
+          // ignore: void_checks
+          BindingsBuilder(() => Get.put(ThemeController(), permanent: true)),
       theme: ThemeData(
         fontFamily: AppStrings.fontFamily,
         scaffoldBackgroundColor: themeController.isNightMode.value

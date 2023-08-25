@@ -92,8 +92,12 @@ class ButtonMethodsController extends GetxController {
     update();
   }
 
-  void parenThesisLong() {
+  void parenThesisForward() {
     input += '(';
+    update();
+  }
+  void parenThesisBackward() {
+    input += ')';
     update();
   }
 

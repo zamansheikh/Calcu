@@ -333,20 +333,17 @@ class _HomePageState extends State<HomePage> {
                     Expanded(
                         child: CalcuButton(
                       buttonColor: AppColors.spButton,
-                      buttonName: "()",
+                      buttonName: "(",
                       onPressed: () {
-                        methodController.parenThesisButton();
-                      },
-                      onLongPressed: () {
-                        methodController.parenThesisLong();
+                        methodController.parenThesisForward();
                       },
                     )),
                     Expanded(
                         child: CalcuButton(
                       buttonColor: AppColors.spButton,
-                      buttonName: "%",
+                      buttonName: ")",
                       onPressed: () {
-                        methodController.percentageButton();
+                        methodController.parenThesisBackward();
                       },
                     )),
                     Expanded(
@@ -394,8 +391,11 @@ class _HomePageState extends State<HomePage> {
                     Expanded(
                         child: CalcuButton(
                       buttonColor: AppColors.spButton,
-                      buttonName: "|",
+                      buttonName: "%",
                       onPressed: () {
+                        methodController.percentageButton();
+                      },
+                      onLongPressed: () {
                         methodController.modButton();
                       },
                     )),
