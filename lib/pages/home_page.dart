@@ -47,8 +47,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () {
-              themeController.isNightMode.value =
-                  themeController.isNightMode.value ? false : true;
+              themeController.nightModeToggle();
             },
             icon: Icon((themeController.isNightMode.value)
                 ? Icons.light_mode_rounded
