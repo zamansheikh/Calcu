@@ -2,43 +2,66 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../config/app_variable.dart';
 
 class ButtonMethodsController extends GetxController {
   final ScrollController _scrollController = ScrollController();
   ScrollController get scrollController => _scrollController;
-  String output = '';
-  String input = '';
-  List<String> savedValue = [];
-  bool equalIsClicked = false;
-  List<int> parenthesis = [0, 0];
+  RxString output = ''.obs;
+  RxString input = ''.obs;
+  RxString result = ''.obs;
+  final savedValue = <String>[].obs;
+  RxBool equalIsClicked = false.obs;
+  RxList<int> parenthesis = [0, 0].obs;
+
+  readData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    List<String>? loadedValues = pref.getStringList('remvalu');
+
+    if (loadedValues != null) {
+      savedValue.value = loadedValues;
+    }
+    savedValue.refresh();
+    update();
+  }
+
+  writeData() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    await pref.setStringList('remvalu', savedValue.toList());
+    update();
+  }
 
   void addNewValue() {
-    if (result != null) {
-      savedValue.add(output);
-    }
+    savedValue.add(output.value);
     update();
+    savedValue.refresh();
   }
 
   void delFromInput() {
-    if (input.isNotEmpty) {
-      input = input.substring(0, input.length - 1);
+    if (input.value.isNotEmpty) {
+      input.value = input.value.substring(0, input.value.length - 1);
     }
     update();
+    input.refresh();
   }
 
   void clickOnInputDisplay() {
-    calculateFunction(input);
-    output != 'Wrong Input!' ? savedValue.add(output) : output;
+    calculateFunction(input.value);
+    output.value != 'Wrong Input!'
+        ? savedValue.add(output.value)
+        : output.value;
     writeData();
     update();
+    output.refresh();
   }
 
   void clickOnResult() {
-    calculateFunction(input);
-    output != 'Wrong Input!' ? savedValue.add(output) : output;
+    calculateFunction(input.value);
+    output.value != 'Wrong Input!'
+        ? savedValue.add(output.value)
+        : output.value;
     writeData();
     update();
+    output.refresh();
   }
 
   void scrollControllerFunc() {
@@ -53,10 +76,10 @@ class ButtonMethodsController extends GetxController {
   }
 
   void pasteFromResult(var index) {
-    if (input.contains('.')) {
-      input += double.parse(savedValue[index]).toInt().toString();
+    if (input.value.contains('.')) {
+      input.value += double.parse(savedValue[index]).toInt().toString();
     } else {
-      input += savedValue[index];
+      input.value += savedValue[index];
     }
     update();
   }
@@ -67,25 +90,25 @@ class ButtonMethodsController extends GetxController {
   }
 
   void acButton() {
-    input = '';
-    output = '';
+    input.value = '';
+    output.value = '';
     update();
   }
 
   void parenThesisButton() {
-    for (int i = 0; i < input.length; i++) {
-      if (input[i] == '(') {
+    for (int i = 0; i < input.value.length; i++) {
+      if (input.value[i] == '(') {
         parenthesis[0]++;
-      } else if (input[i] == ')') {
+      } else if (input.value[i] == ')') {
         parenthesis[1]++;
       }
     }
     if (parenthesis[0] == parenthesis[1]) {
-      input += '(';
+      input.value += '(';
     } else if (parenthesis[0] > parenthesis[1]) {
-      input += ')';
+      input.value += ')';
     } else {
-      input += '(';
+      input.value += '(';
     }
     parenthesis[0] = 0;
     parenthesis[1] = 0;
@@ -93,150 +116,121 @@ class ButtonMethodsController extends GetxController {
   }
 
   void parenThesisForward() {
-    input += '(';
+    input.value += '(';
     update();
   }
+
   void parenThesisBackward() {
-    input += ')';
+    input.value += ')';
     update();
   }
 
   void percentageButton() {
-    input += '%';
+    input.value += '%';
     update();
   }
 
   void squareButton() {
-    input += '^';
+    input.value += '^';
     update();
   }
 
   void rootOverButton() {
-    input += '√';
+    input.value += '√';
     update();
   }
 
   void modButton() {
-    input += '|';
+    input.value += '|';
     update();
   }
 
   void divisionButton() {
-    input += '÷';
+    input.value += '÷';
     update();
   }
 
   void sevenButton() {
-    input += '7';
+    input.value += '7';
     update();
   }
 
   void eightButton() {
-    input += '8';
+    input.value += '8';
     update();
   }
 
   void nineButton() {
-    input += '9';
+    input.value += '9';
     update();
   }
 
   void multiButton() {
-    input += 'x';
+    input.value += 'x';
     update();
   }
 
   void fourButton() {
-    input += '4';
+    input.value += '4';
     update();
   }
 
   void fiveButton() {
-    input += '5';
+    input.value += '5';
     update();
   }
 
   void sixButton() {
-    input += '6';
+    input.value += '6';
     update();
   }
 
   void minusButton() {
-    input += '-';
+    input.value += '-';
     update();
   }
 
   void oneButton() {
-    input += '1';
+    input.value += '1';
     update();
   }
 
   void twoButton() {
-    input += '2';
+    input.value += '2';
     update();
   }
 
   void threeButton() {
-    input += '3';
+    input.value += '3';
     update();
   }
 
   void plusButton() {
-    input += '+';
+    input.value += '+';
     update();
   }
 
   void zeroButton() {
-    input += '0';
+    input.value += '0';
     update();
   }
 
   void dotButton() {
-    input += '.';
+    input.value += '.';
     update();
   }
 
   void equalButton() {
-    calculateFunction(input);
+    calculateFunction(input.value);
     update();
   }
 
   void equalButtonLong() {
-    calculateFunction(input);
-    output = double.parse(output).toStringAsFixed(3);
+    calculateFunction(input.value);
+    output.value = double.parse(output.value).toStringAsFixed(3);
     update();
   }
 
-  readData() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    List<String>? loadedValues = pref.getStringList('remvalu');
-
-    if (loadedValues != null) {
-      savedValue = loadedValues;
-    }
-    update();
-  }
-
-  writeData() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    await pref.setStringList('remvalu', savedValue);
-    update();
-  }
-
-  themeLoadData() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    bool? isDarkMode = pref.getBool('isDark');
-    isDark = isDarkMode ?? true;
-    update();
-  }
-
-  themeData() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    await pref.setBool('isDark', isDark);
-    update();
-  }
-
-  
   void calculateFunction(String str) {
     str = findAndReplace(str, 0);
     str = str.replaceAll('x', '*');
@@ -248,9 +242,9 @@ class ButtonMethodsController extends GetxController {
       Expression exp = p.parse(str);
       ContextModel cm = ContextModel();
       double result = exp.evaluate(EvaluationType.REAL, cm) as double;
-      output = result.toString();
+      output.value = result.toString();
     } catch (e) {
-      output = 'Wrong Input!';
+      output.value = 'Wrong Input!';
     }
     update();
   }

@@ -2,7 +2,7 @@
     <application
         android:label="Calcu"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/calcu_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

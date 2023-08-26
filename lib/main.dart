@@ -6,20 +6,19 @@ import 'config/app_routes.dart';
 import 'config/app_strings.dart';
 
 void main() {
+  Get.put(ThemeController());
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends GetView<ThemeController> {
   MyApp({super.key});
 
-  final themeController = Get.put(ThemeController());
+  ThemeController themeController = Get.find();
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      // ignore: void_checks
-      initialBinding:
-          // ignore: void_checks
-          BindingsBuilder(() => Get.put(ThemeController(), permanent: true)),
+      
       theme: ThemeData(
         fontFamily: AppStrings.fontFamily,
         scaffoldBackgroundColor: themeController.isNightMode.value
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.home,
-      routes: AppRoutes.pages,
+      getPages: AppRoutes.getPages,
     );
   }
 }
