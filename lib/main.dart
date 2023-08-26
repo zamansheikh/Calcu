@@ -13,8 +13,13 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   final themeController = Get.put(ThemeController());
+  
+  
+
   @override
   Widget build(BuildContext context) {
+
+    
     return GetMaterialApp(
       // ignore: void_checks
       initialBinding:
@@ -31,7 +36,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.home,
-      routes: AppRoutes.pages,
+      getPages:AppRoutes.getPages,
     );
   }
 }

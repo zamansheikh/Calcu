@@ -17,18 +17,24 @@ class CalcuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
-      height: 60,
-      width: 80,
-      decoration: BoxDecoration(
-          color: buttonColor, borderRadius: BorderRadius.circular(16)),
-      child: TextButton(
-        onPressed: onPressed,
-        onLongPress: onLongPressed,
-        child: Text(
-          buttonName,
-          style: AppText.calc.copyWith(color: AppColors.textColor),
+    return InkWell(
+      radius: 16,
+      borderRadius: BorderRadius.circular(16),
+      onLongPress: onLongPressed,
+      onTap: onPressed,
+      child: SizedBox(
+        child: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(10),
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          height: 60,
+          width: 80,
+          decoration: BoxDecoration(
+              color: buttonColor, borderRadius: BorderRadius.circular(16)),
+          child: Text(
+            buttonName,
+            style: AppText.calc.copyWith(color: AppColors.textColor),
+          ),
         ),
       ),
     );
