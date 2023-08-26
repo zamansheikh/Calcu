@@ -20,6 +20,7 @@ class ButtonMethodsController extends GetxController {
     if (loadedValues != null) {
       savedValue.value = loadedValues;
     }
+    savedValue.refresh();
     update();
   }
 
@@ -34,6 +35,7 @@ class ButtonMethodsController extends GetxController {
       savedValue.value.add(output.value);
     }
     update();
+    savedValue.refresh();
   }
 
   void delFromInput() {
@@ -41,6 +43,7 @@ class ButtonMethodsController extends GetxController {
       input.value = input.value.substring(0, input.value.length - 1);
     }
     update();
+    input.refresh();
   }
 
   void clickOnInputDisplay() {
@@ -50,6 +53,7 @@ class ButtonMethodsController extends GetxController {
         : output.value;
     writeData();
     update();
+    output.refresh();
   }
 
   void clickOnResult() {
@@ -59,6 +63,7 @@ class ButtonMethodsController extends GetxController {
         : output.value;
     writeData();
     update();
+    output.refresh();
   }
 
   void scrollControllerFunc() {

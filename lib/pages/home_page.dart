@@ -57,6 +57,8 @@ class _HomePageState extends State<HomePage> {
               setState(() {
                 themeController.isNightMode.toggle();
                 themeController.themeDataSave();
+                themeController
+                    .updateThemeData(themeController.isNightMode.value);
               });
             },
             icon: Icon((themeController.isNightMode.value)
