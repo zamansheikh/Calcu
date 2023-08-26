@@ -186,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.grey.withOpacity(0.1),
                       spreadRadius: .5,
                       blurRadius: 2,
-                      offset: Offset(0, 2), // changes position of shadow
+                      offset: const Offset(0, 2), // changes position of shadow
                     ),
                   ],
                   borderRadius: BorderRadius.circular(8),
