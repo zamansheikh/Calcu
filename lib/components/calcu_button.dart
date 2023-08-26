@@ -1,19 +1,25 @@
+import 'package:calcu/controllers/theme_controller.dart';
 import 'package:calcu/styles/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../styles/app_text.dart';
 
 class CalcuButton extends StatelessWidget {
+  ThemeController controller = Get.find();
   final String buttonName;
   final Color buttonColor;
   final Function() onPressed;
   final Function()? onLongPressed;
+  final bool isHasIcon;
 
-  const CalcuButton(
-      {super.key,
-      required this.buttonName,
-      required this.buttonColor,
-      required this.onPressed,
-      this.onLongPressed});
+  CalcuButton({
+    super.key,
+    required this.buttonName,
+    required this.buttonColor,
+    required this.onPressed,
+    this.onLongPressed,
+    this.isHasIcon = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +37,17 @@ class CalcuButton extends StatelessWidget {
           width: 80,
           decoration: BoxDecoration(
               color: buttonColor, borderRadius: BorderRadius.circular(16)),
-          child: Text(
-            buttonName,
-            style: AppText.calc.copyWith(color: AppColors.textColor),
-          ),
+          child: isHasIcon
+              ? Icon(
+                  Icons.backspace,
+                  color: controller.isNightMode.value
+                      ? Colors.white
+                      : Colors.black,
+                )
+              : Text(
+                  buttonName,
+                  style: AppText.calc.copyWith(color: AppColors.textColor),
+                ),
         ),
       ),
     );

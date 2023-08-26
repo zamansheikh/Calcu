@@ -26,14 +26,12 @@ class ButtonMethodsController extends GetxController {
 
   writeData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    await pref.setStringList('remvalu', savedValue.value.toList());
+    await pref.setStringList('remvalu', savedValue.toList());
     update();
   }
 
   void addNewValue() {
-    if (result.value != null) {
-      savedValue.value.add(output.value);
-    }
+    savedValue.add(output.value);
     update();
     savedValue.refresh();
   }
@@ -49,7 +47,7 @@ class ButtonMethodsController extends GetxController {
   void clickOnInputDisplay() {
     calculateFunction(input.value);
     output.value != 'Wrong Input!'
-        ? savedValue.value.add(output.value)
+        ? savedValue.add(output.value)
         : output.value;
     writeData();
     update();
@@ -59,7 +57,7 @@ class ButtonMethodsController extends GetxController {
   void clickOnResult() {
     calculateFunction(input.value);
     output.value != 'Wrong Input!'
-        ? savedValue.value.add(output.value)
+        ? savedValue.add(output.value)
         : output.value;
     writeData();
     update();
@@ -67,7 +65,7 @@ class ButtonMethodsController extends GetxController {
   }
 
   void scrollControllerFunc() {
-    if (savedValue.value.isNotEmpty) {
+    if (savedValue.isNotEmpty) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 100),
@@ -79,15 +77,15 @@ class ButtonMethodsController extends GetxController {
 
   void pasteFromResult(var index) {
     if (input.value.contains('.')) {
-      input.value += double.parse(savedValue.value[index]).toInt().toString();
+      input.value += double.parse(savedValue[index]).toInt().toString();
     } else {
-      input.value += savedValue.value[index];
+      input.value += savedValue[index];
     }
     update();
   }
 
   void delASingleItem(var index) {
-    savedValue.value.removeAt(index);
+    savedValue.removeAt(index);
     update();
   }
 
@@ -100,20 +98,20 @@ class ButtonMethodsController extends GetxController {
   void parenThesisButton() {
     for (int i = 0; i < input.value.length; i++) {
       if (input.value[i] == '(') {
-        parenthesis.value[0]++;
+        parenthesis[0]++;
       } else if (input.value[i] == ')') {
-        parenthesis.value[1]++;
+        parenthesis[1]++;
       }
     }
-    if (parenthesis.value[0] == parenthesis.value[1]) {
+    if (parenthesis[0] == parenthesis[1]) {
       input.value += '(';
-    } else if (parenthesis.value[0] > parenthesis.value[1]) {
+    } else if (parenthesis[0] > parenthesis[1]) {
       input.value += ')';
     } else {
       input.value += '(';
     }
-    parenthesis.value[0] = 0;
-    parenthesis.value[1] = 0;
+    parenthesis[0] = 0;
+    parenthesis[1] = 0;
     update();
   }
 

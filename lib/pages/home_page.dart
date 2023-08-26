@@ -177,21 +177,18 @@ class _HomePageState extends State<HomePage> {
             ),
             const Spacer(),
             Obx(
-              () => Divider(
-                color: themeController.isNightMode.value
-                    ? null
-                    : Colors.black.withOpacity(.5),
-                indent: 5,
-                endIndent: 5,
-                height: 0,
-                thickness: 1,
-              ),
-            ),
-            Obx(
               () => Container(
                 //margin: const EdgeInsets.only(left: 8, right: 8),
                 alignment: Alignment.centerLeft,
                 decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: .5,
+                      blurRadius: 2,
+                      offset: Offset(0, 2), // changes position of shadow
+                    ),
+                  ],
                   borderRadius: BorderRadius.circular(8),
                   color: themeController.isNightMode.value
                       ? Colors.white.withOpacity(.08)
@@ -336,17 +333,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            Obx(
-              () => Divider(
-                color: themeController.isNightMode.value
-                    ? null
-                    : Colors.black.withOpacity(.5),
-                indent: 5,
-                endIndent: 5,
-                height: 0,
-                thickness: 1,
-              ),
-            ),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -356,14 +342,6 @@ class _HomePageState extends State<HomePage> {
                   buttonName: "AC",
                   onPressed: () {
                     methodController.acButton();
-                  },
-                )),
-                Expanded(
-                    child: CalcuButton(
-                  buttonName: "Del",
-                  buttonColor: AppColors.spButton,
-                  onPressed: () {
-                    methodController.delFromInput();
                   },
                 )),
                 Expanded(
@@ -382,6 +360,15 @@ class _HomePageState extends State<HomePage> {
                     methodController.parenThesisBackward();
                   },
                 )),
+                Expanded(
+                    child: CalcuButton(
+                  buttonName: "Del",
+                  buttonColor: AppColors.spButton,
+                  onPressed: () {
+                    methodController.delFromInput();
+                  },
+                  isHasIcon: true,
+                )),
               ],
             ),
             SizedBox(height: themeController.buttonSpaceHeight.toDouble()),
@@ -390,7 +377,7 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "[]^",
+                  buttonName: "☐^",
                   onPressed: () {
                     methodController.squareButton();
                   },
@@ -398,7 +385,7 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "√()",
+                  buttonName: "√(☐)",
                   onPressed: () {
                     methodController.rootOverButton();
                   },
