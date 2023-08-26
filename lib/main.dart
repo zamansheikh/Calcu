@@ -10,6 +10,7 @@ void main() {
   runApp(MyApp());
 }
 
+// ignore: must_be_immutable
 class MyApp extends GetView<ThemeController> {
   MyApp({super.key});
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../styles/app_text.dart';
 
+// ignore: must_be_immutable
 class CalcuButton extends StatelessWidget {
   ThemeController controller = Get.find();
   final String buttonName;
