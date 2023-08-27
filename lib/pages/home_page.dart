@@ -377,7 +377,7 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "☐^",
+                  buttonName: "X^",
                   onPressed: () {
                     methodController.squareButton();
                   },
@@ -385,7 +385,7 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                     child: CalcuButton(
                   buttonColor: AppColors.spButton,
-                  buttonName: "√(☐)",
+                  buttonName: "√(X)",
                   onPressed: () {
                     methodController.rootOverButton();
                   },
