@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img width="" src="assets/icon/app_icon.png"  width=160 height=160  align="center">
+<img width="" src="assets/icon/ic_launcher.png"  width=160 height=160  align="center">
 
 # Calcu
 
