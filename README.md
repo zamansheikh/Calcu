@@ -83,9 +83,12 @@ Join our [Telegram Channel](https://t.me/decodersfamily) for discussion, announc
 ## 💖 Sponsors
 
   --No sponsors
-
-
 Chat Bot will be always free and open source for everyone. If you like it, please consider [sponsoring me](https://github.com/sponsors/zamansheikh)!
+
+## 💲Donate 
+
+<p><a href="https://www.buymeacoffee.com/zamansheikh"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="zamansheikh" /></a></p></br><br>
+
 
 ## 🤝 Contributing
 
