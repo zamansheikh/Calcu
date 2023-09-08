@@ -58,7 +58,6 @@ English
 
 - No Ads
 
-
 - Easy to use and user-friendly.
 
 - [Material Design 3](https://m3.material.io/) style UI, with dynamic color theme.
@@ -69,13 +68,10 @@ English
 
 ## ⬇️ Download
 
-For most devices, it is recommended to install the **arm64-v8a** version of the apks
-Directly from Playstore:[Google Play Store](https://play.google.com/store/apps/details?id=com.decodersfamily.calcu)
-
+- For most devices, it is recommended to install the **arm64-v8a** version of the apps
+- Directly from Playstore:[Google Play Store](https://play.google.com/store/apps/details?id=com.decodersfamily.calcu)
 - Download the latest stable version from [GitHub releases](https://github.com/zamansheikh/Calcu/releases/latest)
-  - Install the [pre-release](https://github.com/zamansheikh/Calcu/releases/) versions to help us test out new features & changes
-
--->
+- Install the [pre-release](https://github.com/zamansheikh/Calcu/releases/) versions to help us test out new features & changes
 
 ## 💬 Contact
 
@@ -83,8 +79,9 @@ Join our [Telegram Channel](https://t.me/decodersfamily) for discussion, announc
 
 ## 💖 Sponsors
 
-  --No sponsors
-Calcu Bot will be always free and open source for everyone. If you like it, please consider [sponsoring me](https://github.com/sponsors/zamansheikh)!
+  -- No sponsors
+  
+  -- Calcu Bot will be always free and open source for everyone. If you like it, please consider [sponsoring me](https://github.com/sponsors/zamansheikh)!
 
 ## 💲Donate 
 
