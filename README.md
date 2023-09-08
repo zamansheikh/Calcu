@@ -69,7 +69,7 @@ English
 ## ⬇️ Download
 
 - For most devices, it is recommended to install the **arm64-v8a** version of the apps
-- Directly from Playstore:[Google Play Store](https://play.google.com/store/apps/details?id=com.decodersfamily.calcu)
+- Directly from Playstore: [Google Play Store](https://play.google.com/store/apps/details?id=com.decodersfamily.calcu)
 - Download the latest stable version from [GitHub releases](https://github.com/zamansheikh/Calcu/releases/latest)
 - Install the [pre-release](https://github.com/zamansheikh/Calcu/releases/) versions to help us test out new features & changes
 
@@ -81,7 +81,7 @@ Join our [Telegram Channel](https://t.me/decodersfamily) for discussion, announc
 
   -- No sponsors
   
-  -- Calcu Bot will be always free and open source for everyone. If you like it, please consider [sponsoring me](https://github.com/sponsors/zamansheikh)!
+  -- Calcu Bot will be always a free and open source for everyone. If you like it, please consider [sponsoring me](https://github.com/sponsors/zamansheikh)!
 
 ## 💲Donate 
 
