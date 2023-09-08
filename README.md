@@ -50,11 +50,11 @@ English
 
 - Do the same on the '%' button to reveal a remainder. 
 
-- The result display window becomes a powerful tool when long-press on results , it save your result in a colorfull button.
+- The result display window becomes a powerful tool when long-press on results, it saves your result in a colorful button.
 
 - Access your saved results with a tap, or remove them by long-pressing the button. 
 
-- Remove all save result by long-pressing 'i' button. 
+- Remove all save results by long-pressing the 'i' button. 
 
 - No Ads
 
@@ -70,6 +70,7 @@ English
 ## ⬇️ Download
 
 For most devices, it is recommended to install the **arm64-v8a** version of the apks
+Directly from Playstore:[Google Play Store](https://play.google.com/store/apps/details?id=com.decodersfamily.calcu)
 
 - Download the latest stable version from [GitHub releases](https://github.com/zamansheikh/Calcu/releases/latest)
   - Install the [pre-release](https://github.com/zamansheikh/Calcu/releases/) versions to help us test out new features & changes
@@ -83,7 +84,7 @@ Join our [Telegram Channel](https://t.me/decodersfamily) for discussion, announc
 ## 💖 Sponsors
 
   --No sponsors
-Chat Bot will be always free and open source for everyone. If you like it, please consider [sponsoring me](https://github.com/sponsors/zamansheikh)!
+Calcu Bot will be always free and open source for everyone. If you like it, please consider [sponsoring me](https://github.com/sponsors/zamansheikh)!
 
 ## 💲Donate 
 
@@ -108,13 +109,13 @@ Youtube Tutorial 😁
 
 ## 📃 License
 
-[![GitHub](https://img.shields.io/github/license/JunkFood02/Seal?style=for-the-badge)](https://github.com/JunkFood02/Seal/blob/main/LICENSE)
+[![GitHub](https://img.shields.io/github/license/zamansheikh/Calcu?style=for-the-badge)](https://github.com/zamansheikh/Calcu/blob/main/LICENSE)
 
 >**Warning**
 
 >Except for the source code licensed under the GPLv3 license,
->all other parties are prohibited from using ChatBot's name as a downloader app,
->and the same is true for ChatBot's derivatives.
+>all other parties are prohibited from using Calcu's name as a downloader app,
+>and the same is true for Calcu's derivatives.
 >Derivatives include but are not limited to forks and unofficial builds.
 
 <div align="right">
