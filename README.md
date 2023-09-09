@@ -90,7 +90,7 @@ Join our [Telegram Channel](https://t.me/decodersfamily) for discussion, announc
 
 ## 🤝 Contributing
 
-Contributions are welcome!
+Contributors are welcome!
 
 
 	
