@@ -74,7 +74,6 @@ For most devices, it is recommended to install the **arm64-v8a** version of the 
 - Download the latest stable version from [GitHub releases](https://github.com/zamansheikh/Calcu/releases/latest)
   - Install the [pre-release](https://github.com/zamansheikh/Calcu/releases/) versions to help us test out new features & changes
 
--->
 
 ## 💬 Contact
 
