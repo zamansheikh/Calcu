@@ -3,7 +3,35 @@ import 'package:get/get.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ButtonMethodsController extends GetxController {
+class HomeController extends GetxController {
+  final RxBool isDarkTheme = true.obs;
+
+  void toggleTheme() {
+    isDarkTheme.value = !isDarkTheme.value;
+    update();
+  }
+
+  final count = 0.obs;
+  @override
+  void onInit() {
+    readData();
+    super.onInit();
+    update();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    update();
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+  }
+
+  void increment() => count.value++;
+
   final ScrollController _scrollController = ScrollController();
   ScrollController get scrollController => _scrollController;
   RxString output = ''.obs;
@@ -14,7 +42,7 @@ class ButtonMethodsController extends GetxController {
   RxList<int> parenthesis = [0, 0].obs;
 
   readData() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
+    SharedPreferences pref =  await SharedPreferences.getInstance();
     List<String>? loadedValues = pref.getStringList('remvalu');
 
     if (loadedValues != null) {
@@ -86,6 +114,11 @@ class ButtonMethodsController extends GetxController {
 
   void delASingleItem(var index) {
     savedValue.removeAt(index);
+    update();
+  }
+
+  void delAllItem() {
+    savedValue.clear();
     update();
   }
 
@@ -295,25 +328,4 @@ class ButtonMethodsController extends GetxController {
     }
     return findAndReplace(value, index + 1);
   }
-
-  // void _showDialog() {
-  //   showDialog(
-  //     builder: (context) {
-  //       return AlertDialog(
-  //         backgroundColor: isDark
-  //             ? AppColors.calcuBackground
-  //             : AppColors.calcuBackgroundLight,
-  //         title: Text(
-  //           "About App",
-  //           style: TextStyle(color: isDark ? Colors.white : Colors.black),
-  //         ),
-  //         content: Text(
-  //           AppStrings.infoText,
-  //           style: TextStyle(color: isDark ? Colors.white : Colors.black),
-  //         ),
-  //       );
-  //     },
-  //     context: context,
-  //   );
-  // }
 }

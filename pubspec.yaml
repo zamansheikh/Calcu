@@ -40,6 +40,7 @@ dependencies:
     sdk: flutter
   flutter_svg: ^2.0.7
   fluttertoast:
+  get_storage:
   flutter_launcher_icons: ^0.13.1
   math_expressions: ^2.4.0
   shared_preferences: ^2.2.0
