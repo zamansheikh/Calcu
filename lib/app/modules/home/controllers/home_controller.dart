@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class HomeController extends GetxController {
   final RxBool isDarkTheme = true.obs;
@@ -25,11 +26,6 @@ class HomeController extends GetxController {
     update();
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
   void increment() => count.value++;
 
   final ScrollController _scrollController = ScrollController();
@@ -42,7 +38,7 @@ class HomeController extends GetxController {
   RxList<int> parenthesis = [0, 0].obs;
 
   readData() async {
-    SharedPreferences pref =  await SharedPreferences.getInstance();
+    SharedPreferences pref = await SharedPreferences.getInstance();
     List<String>? loadedValues = pref.getStringList('remvalu');
 
     if (loadedValues != null) {
@@ -327,5 +323,37 @@ class HomeController extends GetxController {
       }
     }
     return findAndReplace(value, index + 1);
+  }
+
+  String addCommasToNumbers(String input) {
+    String result = '';
+    String currentNumber = '';
+    bool inNumber = false;
+
+    for (int i = 0; i < input.length; i++) {
+      String char = input[i];
+
+      if (RegExp(r'[0-9]').hasMatch(char)) {
+        currentNumber += char;
+        inNumber = true;
+      } else {
+        if (inNumber) {
+          String formattedNumber =
+              NumberFormat("#,##0").format(int.parse(currentNumber));
+          result += formattedNumber;
+          currentNumber = '';
+          inNumber = false;
+        }
+        result += char;
+      }
+    }
+
+    if (inNumber) {
+      String formattedNumber =
+          NumberFormat("#,##0").format(int.parse(currentNumber));
+      result += formattedNumber;
+    }
+
+    return result;
   }
 }

@@ -45,6 +45,7 @@ dependencies:
   math_expressions: ^2.4.0
   shared_preferences: ^2.2.0
   rename: ^2.1.1
+  intl:
 
 
 flutter_launcher_icons:

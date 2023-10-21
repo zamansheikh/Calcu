@@ -9,7 +9,7 @@ class CustomButton extends StatelessWidget {
   final bool hasChild;
   final Widget? child;
 
-  CustomButton({
+  const CustomButton({
     super.key,
     required this.buttonName,
     required this.buttonColor,

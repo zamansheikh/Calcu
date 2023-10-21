@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class Buttonrow2 extends StatelessWidget {
   final HomeController controller;
-  Buttonrow2({super.key, required this.controller});
+  const Buttonrow2({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,7 @@ class Buttonrow2 extends StatelessWidget {
       children: [
         Expanded(
           child: CustomButton(
-            buttonName: "X^",
+            buttonName: "x²",
             buttonColor: Theme.of(context).colorScheme.tertiary,
             onPressed: () {
               controller.squareButton();
@@ -22,7 +22,7 @@ class Buttonrow2 extends StatelessWidget {
         ),
         Expanded(
           child: CustomButton(
-            buttonName: "✓",
+            buttonName: "√(x)",
             buttonColor: Theme.of(context).colorScheme.tertiary,
             onPressed: () {
               controller.rootOverButton();
@@ -45,7 +45,7 @@ class Buttonrow2 extends StatelessWidget {
         ),
         Expanded(
           child: CustomButton(
-            buttonName: "/",
+            buttonName: "÷",
             buttonColor: Theme.of(context).colorScheme.onTertiary,
             onPressed: () {
               controller.divisionButton();

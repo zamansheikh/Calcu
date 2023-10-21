@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class Buttonrow3 extends StatelessWidget {
   final HomeController controller;
-  Buttonrow3({super.key, required this.controller});
+  const Buttonrow3({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

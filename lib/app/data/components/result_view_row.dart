@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class ResultViewRow extends StatefulWidget {
   final HomeController controller;
-  ResultViewRow({super.key, required this.controller});
+  const ResultViewRow({super.key, required this.controller});
 
   @override
   State<ResultViewRow> createState() => _ResultViewRowState();
@@ -22,9 +22,9 @@ class _ResultViewRowState extends State<ResultViewRow> {
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Theme.of(context).colorScheme.background,
           colorText: Theme.of(context).colorScheme.inversePrimary,
-          margin: EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
           borderRadius: 10,
-          duration: Duration(seconds: 1),
+          duration: const Duration(seconds: 1),
         );
         widget.controller.scrollController.animateTo(
           widget.controller.scrollController.position.maxScrollExtent,
@@ -35,7 +35,7 @@ class _ResultViewRowState extends State<ResultViewRow> {
       child: Container(
         width: double.infinity,
         alignment: Alignment.centerRight,
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
@@ -48,9 +48,10 @@ class _ResultViewRowState extends State<ResultViewRow> {
           child: Row(
             children: [
               Text(
-                widget.controller.output.value,
+                widget.controller
+                    .addCommasToNumbers(widget.controller.output.value),
                 style: TextStyle(
-                  fontSize: 50,
+                  fontSize: 45,
                   color: Theme.of(context).colorScheme.inversePrimary,
                 ),
               ),

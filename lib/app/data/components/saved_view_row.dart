@@ -4,12 +4,12 @@ import 'package:get/get.dart';
 
 class SavedViewRaw extends StatelessWidget {
   final HomeController controller;
-  SavedViewRaw({super.key, required this.controller});
+  const SavedViewRaw({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
@@ -32,7 +32,7 @@ class SavedViewRaw extends StatelessWidget {
                       },
                       child: Container(
                         alignment: Alignment.center,
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
@@ -73,13 +73,13 @@ class SavedViewRaw extends StatelessWidget {
                 );
               },
               separatorBuilder: (BuildContext context, int index) {
-                return SizedBox(width: 5);
+                return const SizedBox(width: 5);
               },
             ),
           ),
-          SizedBox(width: 5),
+          const SizedBox(width: 5),
           Container(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
@@ -97,9 +97,9 @@ class SavedViewRaw extends StatelessWidget {
                       .colorScheme
                       .inversePrimary
                       .withOpacity(.8),
-                  margin: EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(10),
                   borderRadius: 10,
-                  duration: Duration(seconds: 1),
+                  duration: const Duration(seconds: 1),
                 );
               },
               onLongPress: () {
@@ -113,9 +113,9 @@ class SavedViewRaw extends StatelessWidget {
                       .colorScheme
                       .inversePrimary
                       .withOpacity(.8),
-                  margin: EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(10),
                   borderRadius: 10,
-                  duration: Duration(seconds: 1),
+                  duration: const Duration(seconds: 1),
                 );
               },
               child: Icon(

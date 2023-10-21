@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class InputViewRow extends StatefulWidget {
   final HomeController controller;
-  InputViewRow({super.key, required this.controller});
+  const InputViewRow({super.key, required this.controller});
 
   @override
   State<InputViewRow> createState() => _InputViewRowState();
@@ -22,9 +22,9 @@ class _InputViewRowState extends State<InputViewRow> {
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Theme.of(context).colorScheme.background,
           colorText: Theme.of(context).colorScheme.inversePrimary,
-          margin: EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
           borderRadius: 10,
-          duration: Duration(seconds: 1),
+          duration: const Duration(seconds: 1),
         );
         widget.controller.scrollController.animateTo(
           widget.controller.scrollController.position.maxScrollExtent,
@@ -35,7 +35,7 @@ class _InputViewRowState extends State<InputViewRow> {
       child: Container(
         width: double.infinity,
         alignment: Alignment.bottomRight,
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
@@ -48,7 +48,8 @@ class _InputViewRowState extends State<InputViewRow> {
           child: Row(
             children: [
               Text(
-                widget.controller.input.value,
+                widget.controller
+                    .addCommasToNumbers(widget.controller.input.value),
                 style: TextStyle(
                   fontSize: 50,
                   color: Theme.of(context).colorScheme.inversePrimary,
