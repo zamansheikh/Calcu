@@ -1,4 +1,5 @@
 import 'package:calcu/app/data/constants/app_string.dart';
+import 'package:calcu/app/data/styles/theme_service.dart';
 import 'package:calcu/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,6 +16,7 @@ class AppBarCustom extends StatefulWidget implements PreferredSizeWidget {
 
 class _AppBarCustomState extends State<AppBarCustom> {
   final controller = Get.find<HomeController>();
+  final ThemeService themeService = ThemeService();
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +52,7 @@ class _AppBarCustomState extends State<AppBarCustom> {
           actions: [
             IconButton(
               onPressed: () {
-                Get.isDarkMode ? ThemeMode.light : ThemeMode.dark;
+                themeService.toggleTheme();
               },
               icon: Get.isDarkMode
                   ? Icon(

@@ -1,3 +1,4 @@
+import 'package:calcu/app/data/styles/theme_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:math_expressions/math_expressions.dart';
@@ -7,10 +8,7 @@ import 'package:intl/intl.dart';
 class HomeController extends GetxController {
   final RxBool isDarkTheme = true.obs;
 
-  void toggleTheme() {
-    isDarkTheme.value = !isDarkTheme.value;
-    update();
-  }
+
 
   final count = 0.obs;
   @override
