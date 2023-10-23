@@ -51,7 +51,7 @@ class _ResultViewRowState extends State<ResultViewRow> {
                 widget.controller
                     .addCommasToNumbers(widget.controller.output.value),
                 style: TextStyle(
-                  fontSize: 40,
+                  fontSize: 35,
                   color: Theme.of(context).colorScheme.inversePrimary,
                 ),
               ),
