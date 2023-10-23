@@ -2,6 +2,7 @@ import 'package:calcu/app/data/constants/app_string.dart';
 import 'package:calcu/app/data/styles/theme_service.dart';
 import 'package:calcu/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class AppBarCustom extends StatefulWidget implements PreferredSizeWidget {
@@ -33,16 +34,20 @@ class _AppBarCustomState extends State<AppBarCustom> {
           ),
           leading: IconButton(
             onPressed: () {
+              HapticFeedback.selectionClick();
               Get.defaultDialog(
-                title: 'About',
-                content: const Text(
-                  AppString.aboutInfo,
-                ),
-                textConfirm: 'OK',
-                confirmTextColor: Theme.of(context).colorScheme.inversePrimary,
-                backgroundColor: Theme.of(context).colorScheme.background,
-                onConfirm: () => Get.back(),
-              );
+                  title: 'About',
+                  content: const Text(
+                    AppString.aboutInfo,
+                  ),
+                  textConfirm: 'OK',
+                  confirmTextColor:
+                      Theme.of(context).colorScheme.inversePrimary,
+                  backgroundColor: Theme.of(context).colorScheme.background,
+                  onConfirm: () {
+                    Get.back();
+                    HapticFeedback.heavyImpact();
+                  });
             },
             icon: Icon(
               Icons.info,
@@ -53,6 +58,7 @@ class _AppBarCustomState extends State<AppBarCustom> {
             IconButton(
               onPressed: () {
                 themeService.toggleTheme();
+                HapticFeedback.lightImpact();
               },
               icon: Get.isDarkMode
                   ? Icon(

@@ -3,11 +3,10 @@ import 'package:get/get.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 
 class HomeController extends GetxController {
   final RxBool isDarkTheme = true.obs;
-
-
 
   final count = 0.obs;
   @override
@@ -63,6 +62,7 @@ class HomeController extends GetxController {
     }
     update();
     input.refresh();
+    HapticFeedback.heavyImpact();
   }
 
   void clickOnInputDisplay() {
@@ -73,6 +73,7 @@ class HomeController extends GetxController {
     writeData();
     update();
     output.refresh();
+    HapticFeedback.heavyImpact();
   }
 
   void clickOnResult() {
@@ -83,6 +84,7 @@ class HomeController extends GetxController {
     writeData();
     update();
     output.refresh();
+    HapticFeedback.heavyImpact();
   }
 
   void scrollControllerFunc() {
@@ -102,16 +104,19 @@ class HomeController extends GetxController {
     } else {
       input.value += savedValue[index];
     }
+    HapticFeedback.vibrate();
     update();
   }
 
   void delASingleItem(var index) {
     savedValue.removeAt(index);
+    HapticFeedback.vibrate();
     update();
   }
 
   void delAllItem() {
     savedValue.clear();
+    HapticFeedback.heavyImpact();
     update();
   }
 
@@ -119,6 +124,7 @@ class HomeController extends GetxController {
     input.value = '';
     output.value = '';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void parenThesisButton() {
@@ -144,117 +150,140 @@ class HomeController extends GetxController {
   void parenThesisForward() {
     input.value += '(';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void parenThesisBackward() {
     input.value += ')';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void percentageButton() {
     input.value += '%';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void squareButton() {
     input.value += '^';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void rootOverButton() {
     input.value += '√';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void modButton() {
     input.value += '|';
     update();
+    HapticFeedback.vibrate();
   }
 
   void divisionButton() {
     input.value += '÷';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void sevenButton() {
     input.value += '7';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void eightButton() {
     input.value += '8';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void nineButton() {
     input.value += '9';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void multiButton() {
     input.value += 'x';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void fourButton() {
     input.value += '4';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void fiveButton() {
     input.value += '5';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void sixButton() {
     input.value += '6';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void minusButton() {
     input.value += '-';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void oneButton() {
     input.value += '1';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void twoButton() {
     input.value += '2';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void threeButton() {
     input.value += '3';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void plusButton() {
     input.value += '+';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void zeroButton() {
     input.value += '0';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void dotButton() {
     input.value += '.';
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void equalButton() {
     calculateFunction(input.value);
     update();
+    HapticFeedback.heavyImpact();
   }
 
   void equalButtonLong() {
     calculateFunction(input.value);
     output.value = double.parse(output.value).toStringAsFixed(3);
     update();
+    HapticFeedback.vibrate();
   }
 
   void calculateFunction(String str) {
