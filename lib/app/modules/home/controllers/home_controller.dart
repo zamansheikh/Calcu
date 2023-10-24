@@ -290,14 +290,18 @@ class HomeController extends GetxController {
   }
 
   void equalButton() {
-    calculateFunction(input.value);
+    if (input.value.isNotEmpty) {
+      calculateFunction(input.value);
+    }
     update();
     HapticFeedback.heavyImpact();
   }
 
   void equalButtonLong() {
-    calculateFunction(input.value);
-    output.value = double.parse(output.value).toStringAsFixed(3);
+    if (input.value.isNotEmpty) {
+      calculateFunction(input.value);
+      output.value = double.parse(output.value).toStringAsFixed(3);
+    }
     update();
     HapticFeedback.vibrate();
   }

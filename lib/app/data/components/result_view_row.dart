@@ -1,6 +1,5 @@
 import 'package:calcu/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class ResultViewRow extends StatefulWidget {
   final HomeController controller;
@@ -16,16 +15,16 @@ class _ResultViewRowState extends State<ResultViewRow> {
     return InkWell(
       onLongPress: () {
         widget.controller.clickOnResult();
-        Get.snackbar(
-          'Result',
-          'Copied to clipboard',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Theme.of(context).colorScheme.background,
-          colorText: Theme.of(context).colorScheme.inversePrimary,
-          margin: const EdgeInsets.all(10),
-          borderRadius: 10,
-          duration: const Duration(seconds: 1),
-        );
+        // Get.snackbar(
+        //   'Result',
+        //   'Copied to clipboard',
+        //   snackPosition: SnackPosition.BOTTOM,
+        //   backgroundColor: Theme.of(context).colorScheme.background,
+        //   colorText: Theme.of(context).colorScheme.inversePrimary,
+        //   margin: const EdgeInsets.all(10),
+        //   borderRadius: 10,
+        //   duration: const Duration(seconds: 1),
+        // );
         widget.controller.scrollController.animateTo(
           widget.controller.scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 500),
