@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:math_expressions/math_expressions.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
 class HomeController extends GetxController {
