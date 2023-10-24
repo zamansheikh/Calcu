@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:math_expressions/math_expressions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:math_expressions/math_expressions.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
@@ -65,10 +65,27 @@ class HomeController extends GetxController {
     HapticFeedback.heavyImpact();
   }
 
+  //New Function to Handle Input Display
+
+  String convertDoubleToInt(String input) {
+    double doubleValue;
+    try {
+      doubleValue = double.parse(input);
+    } catch (e) {
+      return input;
+    }
+
+    if (doubleValue == doubleValue.toInt()) {
+      return doubleValue.toInt().toString();
+    } else {
+      return input;
+    }
+  }
+
   void clickOnInputDisplay() {
     calculateFunction(input.value);
     output.value != 'Wrong Input!'
-        ? savedValue.add(output.value)
+        ? savedValue.add(convertDoubleToInt(output.value))
         : output.value;
     writeData();
     update();
@@ -79,7 +96,7 @@ class HomeController extends GetxController {
   void clickOnResult() {
     calculateFunction(input.value);
     output.value != 'Wrong Input!'
-        ? savedValue.add(output.value)
+        ? savedValue.add(convertDoubleToInt(output.value))
         : output.value;
     writeData();
     update();
@@ -351,35 +368,115 @@ class HomeController extends GetxController {
     return findAndReplace(value, index + 1);
   }
 
+  // String addCommasToNumbers(String input) {
+  //   String result = '';
+  //   String currentNumber = '';
+  //   bool inNumber = false;
+
+  //   for (int i = 0; i < input.length; i++) {
+  //     String char = input[i];
+
+  //     if (RegExp(r'[0-9]').hasMatch(char)) {
+  //       currentNumber += char;
+  //       inNumber = true;
+  //     } else {
+  //       if (inNumber) {
+  //         String formattedNumber =
+  //             NumberFormat("#,##0").format(int.parse(currentNumber));
+  //         result += formattedNumber;
+  //         currentNumber = '';
+  //         inNumber = false;
+  //       }
+  //       result += char;
+  //     }
+  //   }
+
+  //   if (inNumber) {
+  //     String formattedNumber =
+  //         NumberFormat("#,##0").format(int.parse(currentNumber));
+  //     result += formattedNumber;
+  //   }
+
+  //   return result;
+  // }
+
+  // String addCommasToNumbers(String input) {
+  //   int startP = 0;
+  //   bool startPFound = false;
+
+  //   int endP = 0;
+  //   bool endPFound = false;
+
+  //   String insertCommasInSubstring(String input, int startIndex, int endIndex) {
+  //     if (startIndex >= endIndex ||
+  //         startIndex < 0 ||
+  //         endIndex >= input.length) {
+  //       // Invalid input, return the original string
+  //       return input;
+  //     }
+
+  //     String substring = input.substring(startIndex, endIndex + 1);
+
+  //     int counter = 0;
+
+  //     for (var end = endIndex; end > startIndex; end--) {
+  //       counter++;
+  //       if (counter % 3 == 0) {
+  //         //split before this index and split after this index
+  //         String firstPart = substring.substring(0, end - startIndex);
+  //         String secondPart =
+  //             substring.substring(end - startIndex, substring.length);
+  //         //add comma
+  //         substring = "$firstPart,$secondPart";
+  //       }
+  //     }
+  //     String result = input.replaceRange(startIndex, endIndex + 1, substring);
+
+  //     return result;
+  //   }
+
+  //   if (input.length > 3) {
+  //     for (int i = 0; i < input.length; i++) {
+  //       if (RegExp(r'[0-9]').hasMatch(input[i])) {
+  //         //found start of number
+  //         if (i == 0 &&
+  //             input.length > 1 &&
+  //             RegExp(r'[0-9]').hasMatch(input[i])) {
+  //           startP = i;
+  //           startPFound = true;
+  //         } else if (!RegExp(r'[0-9]').hasMatch(input[i - 1]) &&
+  //             RegExp(r'[0-9]').hasMatch(input[i])) {
+  //           startP = i;
+  //           startPFound = true;
+  //         }
+  //         //found end of number
+  //         if (i == input.length - 1) {
+  //           endP = i;
+  //           endPFound = true;
+  //         } else if (RegExp(r'[0-9]').hasMatch(input[i]) &&
+  //             !RegExp(r'[0-9]').hasMatch(input[i + 1])) {
+  //           endP = i;
+  //           endPFound = true;
+  //         }
+  //       }
+
+  //       if (startPFound && endPFound) {
+  //         // print("Start p = $startP and end p = $endP");
+  //         input = insertCommasInSubstring(input, startP, endP);
+  //         startPFound = false;
+  //         endPFound = false;
+  //       }
+  //     }
+  //     return input;
+  //   } else {
+  //     return input;
+  //   }
+  // }
+
   String addCommasToNumbers(String input) {
-    String result = '';
-    String currentNumber = '';
-    bool inNumber = false;
-
-    for (int i = 0; i < input.length; i++) {
-      String char = input[i];
-
-      if (RegExp(r'[0-9]').hasMatch(char)) {
-        currentNumber += char;
-        inNumber = true;
-      } else {
-        if (inNumber) {
-          String formattedNumber =
-              NumberFormat("#,##0").format(int.parse(currentNumber));
-          result += formattedNumber;
-          currentNumber = '';
-          inNumber = false;
-        }
-        result += char;
-      }
-    }
-
-    if (inNumber) {
-      String formattedNumber =
-          NumberFormat("#,##0").format(int.parse(currentNumber));
-      result += formattedNumber;
-    }
-
-    return result;
+    return input.replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(\.|$))'),
+      (Match match) => '${match.group(1)},',
+    );
   }
 }

@@ -9,7 +9,7 @@ Remove all save result by long-pressing 'i' button. Thank you for choosing my ap
 
 Developer: Zaman Sheikh
 Github: https://github.com/zamansheikh
-Version: 3.3.2
+Version: 3.3.3
 
 Tester: Ahasan Habib Santo, Mohaiminul Islam Nafiz""";
 }

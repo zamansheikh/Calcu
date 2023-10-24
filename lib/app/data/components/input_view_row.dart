@@ -50,6 +50,7 @@ class _InputViewRowState extends State<InputViewRow> {
               Text(
                 widget.controller
                     .addCommasToNumbers(widget.controller.input.value),
+               
                 style: TextStyle(
                   fontSize: 50,
                   color: Theme.of(context).colorScheme.inversePrimary,

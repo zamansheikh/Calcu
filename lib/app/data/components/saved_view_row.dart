@@ -62,6 +62,7 @@ class SavedViewRaw extends StatelessWidget {
                           visualDensity: VisualDensity.compact,
                           onPressed: () {
                             controller.delASingleItem(index);
+                            controller.writeData();
                           },
                           icon: const Icon(Icons.clear),
                           color: Colors.white,
@@ -78,46 +79,32 @@ class SavedViewRaw extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 5),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.inversePrimary,
+          InkWell(
+            onLongPress: () {
+              controller.delAllItem();
+              controller.writeData();
+              Get.snackbar(
+                'Deleted',
+                'All saved value',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Theme.of(context).colorScheme.background,
+                colorText: Theme.of(context)
+                    .colorScheme
+                    .inversePrimary
+                    .withOpacity(.8),
+                margin: const EdgeInsets.all(10),
+                borderRadius: 10,
+                duration: const Duration(milliseconds: 700),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
               ),
-            ),
-            child: InkWell(
-              onTap: () {
-                Get.snackbar(
-                  'Long Press',
-                  'To clear all saved value',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Theme.of(context).colorScheme.background,
-                  colorText: Theme.of(context)
-                      .colorScheme
-                      .inversePrimary
-                      .withOpacity(.8),
-                  margin: const EdgeInsets.all(10),
-                  borderRadius: 10,
-                  duration: const Duration(seconds: 1),
-                );
-              },
-              onLongPress: () {
-                controller.delAllItem();
-                Get.snackbar(
-                  'Deleted',
-                  'All saved value',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Theme.of(context).colorScheme.background,
-                  colorText: Theme.of(context)
-                      .colorScheme
-                      .inversePrimary
-                      .withOpacity(.8),
-                  margin: const EdgeInsets.all(10),
-                  borderRadius: 10,
-                  duration: const Duration(seconds: 1),
-                );
-              },
               child: Icon(
                 Icons.delete_forever,
                 color: Theme.of(context).colorScheme.inversePrimary,
