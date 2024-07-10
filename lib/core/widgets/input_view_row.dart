@@ -38,7 +38,7 @@ class _InputViewRowState extends State<InputViewRow> {
             child: Row(
               children: [
                 Text(
-                  value.addCommasToNumbers(value.input.value),
+                  value.addCommasToNumbers(value.input),
                   style: TextStyle(
                     fontSize: 50,
                     color: Theme.of(context).colorScheme.inversePrimary,

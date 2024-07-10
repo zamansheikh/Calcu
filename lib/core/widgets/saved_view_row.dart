@@ -1,6 +1,6 @@
+import 'package:calcu/core/widgets/snakebar.dart';
 import 'package:calcu/presentation/providers/home_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class SavedViewRaw extends StatelessWidget {
@@ -85,19 +85,7 @@ class SavedViewRaw extends StatelessWidget {
                 onLongPress: () {
                   value.delAllItem();
                   value.writeData();
-                  Get.snackbar(
-                    'Deleted',
-                    'All saved value',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    colorText: Theme.of(context)
-                        .colorScheme
-                        .inversePrimary
-                        .withOpacity(.8),
-                    margin: const EdgeInsets.all(10),
-                    borderRadius: 10,
-                    duration: const Duration(milliseconds: 700),
-                  );
+                  showCustomSnackbar(context, "All Deleted", "Deleted");
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),

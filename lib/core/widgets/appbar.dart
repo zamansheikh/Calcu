@@ -1,8 +1,8 @@
 import 'package:calcu/core/constants/app_string.dart';
-import 'package:calcu/theme/app_colors.dart';
-import 'package:calcu/theme/theme_service.dart';
+import 'package:calcu/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class AppBarCustom extends StatefulWidget implements PreferredSizeWidget {
   const AppBarCustom({Key? key}) : super(key: key);
@@ -15,12 +15,10 @@ class AppBarCustom extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AppBarCustomState extends State<AppBarCustom> {
-  final ThemeService themeService = ThemeService();
-
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: CalcuAppColors.primary,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       elevation: 0,
       title: Text(
         'Calcu',
@@ -71,18 +69,20 @@ class _AppBarCustomState extends State<AppBarCustom> {
         ),
       ),
       actions: [
-        IconButton(
-          onPressed: () {
-            themeService.toggleTheme();
-            HapticFeedback.lightImpact();
-          },
-          icon:  Icon(
-            themeService.isDarkMode()
-                ? Icons.light_mode
-                : Icons.dark_mode,
-            color: Theme.of(context).colorScheme.inversePrimary,
-          ),
-        ),
+        Consumer<ThemeProvider>(builder: (context, themeService, _) {
+          return IconButton(
+            onPressed: () {
+              themeService.toggleTheme();
+              HapticFeedback.lightImpact();
+            },
+            icon: Icon(
+              context.watch<ThemeProvider>().isDarkMode
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
+              color: Theme.of(context).colorScheme.inversePrimary,
+            ),
+          );
+        }),
       ],
       centerTitle: true,
     );

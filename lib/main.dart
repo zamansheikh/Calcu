@@ -1,7 +1,7 @@
 import 'package:calcu/presentation/pages/home_page.dart';
 import 'package:calcu/presentation/providers/home_provider.dart';
 import 'package:calcu/theme/app_theme.dart';
-import 'package:calcu/theme/theme_service.dart';
+import 'package:calcu/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
@@ -22,17 +22,18 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => di.sl<HomeProvider>()),
-        ChangeNotifierProvider(create: (_) => di.sl<ThemeService>()),
+        ChangeNotifierProvider(create: (_) => di.sl<ThemeProvider>()),
       ],
-      child: MaterialApp(
-        title: 'Calcu App',
-        theme: AppTheme.defalultTheme,
-        home: const HomePage(),
-        // themeMode: context.read<ThemeService>().themeModeGetter(),
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        debugShowCheckedModeBanner: false,
-      ),
+      child: Consumer<ThemeProvider>(builder: (context, value, _) {
+        return MaterialApp(
+          title: 'Calcu App',
+          theme: AppTheme.defalultTheme,
+          home: const HomePage(),
+          themeMode: value.themeMode,
+          darkTheme: AppTheme.darkTheme,
+          debugShowCheckedModeBanner: false,
+        );
+      }),
     );
   }
 }

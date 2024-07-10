@@ -1,40 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:flutter/services.dart';
 
 class HomeProvider extends ChangeNotifier {
-  final RxBool isDarkTheme = true.obs;
+  final bool isDarkTheme = true;
 
-  final count = 0.obs;
-  
+  var count = 0;
+
   //when the controller is initialized, the readData function is called
   void onInit() {
     readData();
     notifyListeners();
   }
 
-
-  void increment() => count.value++;
+  void increment(){
+     count++;
+      notifyListeners();
+  }
 
   final ScrollController _scrollController = ScrollController();
   ScrollController get scrollController => _scrollController;
-  RxString output = ''.obs;
-  RxString input = ''.obs;
-  RxString result = ''.obs;
-  final savedValue = <String>[].obs;
-  RxBool equalIsClicked = false.obs;
-  RxList<int> parenthesis = [0, 0].obs;
+  String output = '';
+  String input = '';
+  String result = '';
+  var savedValue = <String>[];
+  bool equalIsClicked = false;
+  List<int> parenthesis = [0, 0];
 
   readData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     List<String>? loadedValues = pref.getStringList('remvalu');
 
     if (loadedValues != null) {
-      savedValue.value = loadedValues;
+      savedValue = loadedValues;
     }
-    savedValue.refresh();
     notifyListeners();
   }
 
@@ -45,17 +45,15 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void addNewValue() {
-    savedValue.add(output.value);
+    savedValue.add(output);
     notifyListeners();
-    savedValue.refresh();
   }
 
   void delFromInput() {
-    if (input.value.isNotEmpty) {
-      input.value = input.value.substring(0, input.value.length - 1);
+    if (input.isNotEmpty) {
+      input = input.substring(0, input.length - 1);
     }
     notifyListeners();
-    input.refresh();
     HapticFeedback.heavyImpact();
   }
 
@@ -77,24 +75,22 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void clickOnInputDisplay() {
-    calculateFunction(input.value);
-    output.value != 'Wrong Input!'
-        ? savedValue.add(convertDoubleToInt(output.value))
-        : output.value;
+    calculateFunction(input);
+    output != 'Wrong Input!'
+        ? savedValue.add(convertDoubleToInt(output))
+        : output;
     writeData();
     notifyListeners();
-    output.refresh();
     HapticFeedback.heavyImpact();
   }
 
   void clickOnResult() {
-    calculateFunction(input.value);
-    output.value != 'Wrong Input!'
-        ? savedValue.add(convertDoubleToInt(output.value))
-        : output.value;
+    calculateFunction(input);
+    output != 'Wrong Input!'
+        ? savedValue.add(convertDoubleToInt(output))
+        : output;
     writeData();
     notifyListeners();
-    output.refresh();
     HapticFeedback.heavyImpact();
   }
 
@@ -110,10 +106,10 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void pasteFromResult(var index) {
-    if (input.value.contains('.')) {
-      input.value += double.parse(savedValue[index]).toInt().toString();
+    if (input.contains('.')) {
+      input += double.parse(savedValue[index]).toInt().toString();
     } else {
-      input.value += savedValue[index];
+      input += savedValue[index];
     }
     HapticFeedback.vibrate();
     notifyListeners();
@@ -132,26 +128,26 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void acButton() {
-    input.value = '';
-    output.value = '';
+    input = '';
+    output = '';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void parenThesisButton() {
-    for (int i = 0; i < input.value.length; i++) {
-      if (input.value[i] == '(') {
+    for (int i = 0; i < input.length; i++) {
+      if (input[i] == '(') {
         parenthesis[0]++;
-      } else if (input.value[i] == ')') {
+      } else if (input[i] == ')') {
         parenthesis[1]++;
       }
     }
     if (parenthesis[0] == parenthesis[1]) {
-      input.value += '(';
+      input += '(';
     } else if (parenthesis[0] > parenthesis[1]) {
-      input.value += ')';
+      input += ')';
     } else {
-      input.value += '(';
+      input += '(';
     }
     parenthesis[0] = 0;
     parenthesis[1] = 0;
@@ -159,143 +155,143 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void parenThesisForward() {
-    input.value += '(';
+    input += '(';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void parenThesisBackward() {
-    input.value += ')';
+    input += ')';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void percentageButton() {
-    input.value += '%';
+    input += '%';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void squareButton() {
-    input.value += '^';
+    input += '^';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void rootOverButton() {
-    input.value += '√';
+    input += '√';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void modButton() {
-    input.value += '|';
+    input += '|';
     notifyListeners();
     HapticFeedback.vibrate();
   }
 
   void divisionButton() {
-    input.value += '÷';
+    input += '÷';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void sevenButton() {
-    input.value += '7';
+    input += '7';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void eightButton() {
-    input.value += '8';
+    input += '8';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void nineButton() {
-    input.value += '9';
+    input += '9';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void multiButton() {
-    input.value += 'x';
+    input += 'x';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void fourButton() {
-    input.value += '4';
+    input += '4';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void fiveButton() {
-    input.value += '5';
+    input += '5';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void sixButton() {
-    input.value += '6';
+    input += '6';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void minusButton() {
-    input.value += '-';
+    input += '-';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void oneButton() {
-    input.value += '1';
+    input += '1';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void twoButton() {
-    input.value += '2';
+    input += '2';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void threeButton() {
-    input.value += '3';
+    input += '3';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void plusButton() {
-    input.value += '+';
+    input += '+';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void zeroButton() {
-    input.value += '0';
+    input += '0';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void dotButton() {
-    input.value += '.';
+    input += '.';
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void equalButton() {
-    if (input.value.isNotEmpty) {
-      calculateFunction(input.value);
+    if (input.isNotEmpty) {
+      calculateFunction(input);
     }
     notifyListeners();
     HapticFeedback.heavyImpact();
   }
 
   void equalButtonLong() {
-    if (input.value.isNotEmpty) {
-      calculateFunction(input.value);
-      output.value = double.parse(output.value).toStringAsFixed(3);
+    if (input.isNotEmpty) {
+      calculateFunction(input);
+      output = double.parse(output).toStringAsFixed(3);
     }
     notifyListeners();
     HapticFeedback.vibrate();
@@ -312,9 +308,9 @@ class HomeProvider extends ChangeNotifier {
       Expression exp = p.parse(str);
       ContextModel cm = ContextModel();
       double result = exp.evaluate(EvaluationType.REAL, cm) as double;
-      output.value = result.toString();
+      output = result.toString();
     } catch (e) {
-      output.value = 'Wrong Input!';
+      output = 'Wrong Input!';
     }
     notifyListeners();
   }

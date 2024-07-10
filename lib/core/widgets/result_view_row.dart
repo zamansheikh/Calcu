@@ -39,7 +39,7 @@ class _ResultViewRowState extends State<ResultViewRow> {
               child: Row(
                 children: [
                   Text(
-                    value.addCommasToNumbers(value.output.value),
+                    value.addCommasToNumbers(value.output),
                     style: TextStyle(
                       fontSize: 35,
                       color: Theme.of(context).colorScheme.inversePrimary,
