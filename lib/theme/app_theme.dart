@@ -1,4 +1,4 @@
-import 'package:calcu/app/data/styles/colors.dart';
+import 'package:calcu/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
@@ -7,7 +7,6 @@ class AppTheme {
     brightness: Brightness.light,
     colorScheme: ColorScheme.light(
       primary: AppColors.calcuBackgroundLight,
-      background: AppColors.calcuBackgroundLight,
       secondary: AppColors.white,
       inversePrimary: Colors.black,
       surface: Colors.black.withOpacity(.1),
@@ -21,7 +20,6 @@ class AppTheme {
     brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
       primary: AppColors.calcuBackground,
-      background: AppColors.calcuBackground,
       secondary: AppColors.black,
       inversePrimary: Colors.white,
       surface: Colors.white.withOpacity(.1),

@@ -1,4 +1,5 @@
 class AppString {
+  static const String ok = 'OK';
   static const String aboutInfo =
       """Our calculator redefines simplicity with innovative features. 
 Long-press '=' for precise results with three decimal places, or '%' to reveal the remainder.
