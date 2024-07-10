@@ -14,14 +14,14 @@ class ThemeProvider with ChangeNotifier {
   ThemeMode get themeMode => _themeMode ?? ThemeMode.system;
 
   bool get isDarkMode {
-    const currentMode = ThemeMode.system;
+    final currentMode = themeMode;
     switch (currentMode) {
       case ThemeMode.dark:
         return true;
       case ThemeMode.light:
         return false;
-      case ThemeMode
-            .system: // Check system settings when using ThemeMode.system
+      case ThemeMode.system:
+        // Check system settings when using ThemeMode.system
         final brightness =
             SchedulerBinding.instance.platformDispatcher.platformBrightness;
         return brightness == Brightness.dark;
@@ -43,12 +43,10 @@ class ThemeProvider with ChangeNotifier {
     final currentMode = themeMode;
     ThemeMode newMode;
 
-    if (currentMode == ThemeMode.system) {
+    if (currentMode == ThemeMode.dark) {
       newMode = ThemeMode.light;
-    } else if (currentMode == ThemeMode.light) {
-      newMode = ThemeMode.dark;
     } else {
-      newMode = ThemeMode.system;
+      newMode = ThemeMode.dark;
     }
 
     _themeMode = newMode;
