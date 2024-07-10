@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-void showCustomSnackbar(BuildContext context, String content, String actionText) {
+void showCustomSnackbar(
+    BuildContext context, String content, String actionText) {
   final snackBar = SnackBar(
     content: Text(
-      'All saved value',
+      content,
       style: TextStyle(
         color: Theme.of(context).colorScheme.inversePrimary.withOpacity(.8),
       ),
@@ -14,9 +15,9 @@ void showCustomSnackbar(BuildContext context, String content, String actionText)
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),
     ),
-    duration: const Duration(milliseconds: 700),
+    duration: const Duration(milliseconds: 800),
     action: SnackBarAction(
-      label: 'Deleted',
+      label: actionText,
       textColor: Theme.of(context).colorScheme.inversePrimary,
       onPressed: () {
         // Perform some action if needed

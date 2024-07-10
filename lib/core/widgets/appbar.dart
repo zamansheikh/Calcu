@@ -50,6 +50,9 @@ class _AppBarCustomState extends State<AppBarCustom> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
+                    style: TextButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondary),
                     child: Text(
                       AppString.ok,
                       style: TextStyle(
