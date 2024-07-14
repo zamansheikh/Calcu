@@ -3,14 +3,17 @@ import 'package:calcu/presentation/providers/home_provider.dart';
 import 'package:calcu/theme/app_theme.dart';
 import 'package:calcu/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init();
+
   di.init();
+
+  // Initialize HomeProvider and call onInit
+  final homeProvider = di.sl<HomeProvider>();
+  homeProvider.onInit();
   runApp(const MyApp());
 }
 

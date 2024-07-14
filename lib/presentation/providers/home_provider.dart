@@ -7,16 +7,18 @@ class HomeProvider extends ChangeNotifier {
   final bool isDarkTheme = true;
 
   var count = 0;
-
+  HomeProvider() {
+    onInit();
+  }
   //when the controller is initialized, the readData function is called
-  void onInit() {
-    readData();
+  void onInit() async {
+    await readData();
     notifyListeners();
   }
 
-  void increment(){
-     count++;
-      notifyListeners();
+  void increment() {
+    count++;
+    notifyListeners();
   }
 
   final ScrollController _scrollController = ScrollController();
@@ -34,6 +36,7 @@ class HomeProvider extends ChangeNotifier {
 
     if (loadedValues != null) {
       savedValue = loadedValues;
+      print(savedValue);
     }
     notifyListeners();
   }
