@@ -8,7 +8,7 @@ Save results by long-pressing in the result window or input view. Access them wi
 Developer: Zaman Sheikh
 GitHub: https://github.com/zamansheikh
 Email: decodersfamily@gmail.com
-Version: 3.4.0
+Version: 3.5.0
 
 Testers:
 Ahasan Habib Santo, Mohaiminul Islam Nafiz""";
