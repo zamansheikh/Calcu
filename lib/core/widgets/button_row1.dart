@@ -1,6 +1,7 @@
 import 'package:calcu/core/widgets/button.dart';
 import 'package:calcu/presentation/providers/home_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class Buttonrow1 extends StatelessWidget {
@@ -51,6 +52,7 @@ class Buttonrow1 extends StatelessWidget {
               },
               textColor: Theme.of(context).colorScheme.inversePrimary,
               child: Icon(
+                size: 25.sp,
                 Icons.backspace,
                 color: Theme.of(context).colorScheme.inversePrimary,
               ),

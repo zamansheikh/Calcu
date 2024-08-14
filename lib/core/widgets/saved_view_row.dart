@@ -1,6 +1,7 @@
 import 'package:calcu/core/widgets/snakebar.dart';
 import 'package:calcu/presentation/providers/home_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class SavedViewRaw extends StatelessWidget {
@@ -66,9 +67,12 @@ class SavedViewRaw extends StatelessWidget {
                               value.delASingleItem(index);
                               value.writeData();
                             },
-                            icon: const Icon(Icons.clear),
+                            icon: Icon(
+                              Icons.clear,
+                              size: 16.sp,
+                            ),
                             color: Colors.white,
-                            iconSize: 16,
+                            iconSize: 16.sp,
                           ),
                         ),
                       )
@@ -98,6 +102,7 @@ class SavedViewRaw extends StatelessWidget {
                 child: Icon(
                   Icons.delete_forever,
                   color: Theme.of(context).colorScheme.inversePrimary,
+                  size: 20.sp,
                 ),
               ),
             ),
