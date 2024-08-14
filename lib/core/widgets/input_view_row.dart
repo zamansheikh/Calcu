@@ -1,5 +1,6 @@
 import 'package:calcu/presentation/providers/home_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class InputViewRow extends StatefulWidget {
@@ -25,9 +26,9 @@ class _InputViewRowState extends State<InputViewRow> {
         child: Container(
           width: double.infinity,
           alignment: Alignment.bottomRight,
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(8.sp),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.sp),
             border: Border.all(
               color: Theme.of(context).colorScheme.inversePrimary,
             ),
@@ -40,7 +41,7 @@ class _InputViewRowState extends State<InputViewRow> {
                 Text(
                   value.addCommasToNumbers(value.input),
                   style: TextStyle(
-                    fontSize: 50,
+                    fontSize: 50.sp,
                     color: Theme.of(context).colorScheme.inversePrimary,
                   ),
                 ),

@@ -26,19 +26,17 @@ class CustomButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: InkWell(
-        radius: 16,
+        radius: 16.sp,
         borderRadius: BorderRadius.circular(16),
         onLongPress: onLongPressed,
         onTap: onPressed,
         child: SizedBox(
           child: Container(
             alignment: Alignment.center,
-            padding: const EdgeInsets.all(10),
-            margin: const EdgeInsets.symmetric(horizontal: 3),
-            // height: 60,
-            // width: 80,
+            padding:  EdgeInsets.all(10.sp),
+            margin:  EdgeInsets.symmetric(horizontal: 3.sp),
             decoration: BoxDecoration(
-                color: buttonColor, borderRadius: BorderRadius.circular(16)),
+                color: buttonColor, borderRadius: BorderRadius.circular(16.sp)),
             child: hasChild
                 ? child
                 : Text(

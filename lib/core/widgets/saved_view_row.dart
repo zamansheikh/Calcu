@@ -11,9 +11,9 @@ class SavedViewRaw extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<HomeProvider>(builder: (context, value, _) {
       return Container(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(8.sp),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(10.sp),
           border: Border.all(
             color: Theme.of(context).colorScheme.inversePrimary,
           ),
@@ -34,10 +34,10 @@ class SavedViewRaw extends StatelessWidget {
                         },
                         child: Container(
                           alignment: Alignment.center,
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(8.sp),
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(10.sp),
                             // border: Border.all(
                             //   color: Theme.of(context).colorScheme.inversePrimary,
                             // ),
@@ -45,7 +45,7 @@ class SavedViewRaw extends StatelessWidget {
                           child: Text(
                             "${index + 1} : ${double.parse(value.savedValue[index]).toStringAsFixed(2)}",
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 16.sp,
                               color:
                                   Theme.of(context).colorScheme.inversePrimary,
                             ),
@@ -53,14 +53,14 @@ class SavedViewRaw extends StatelessWidget {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 3),
+                        padding: EdgeInsets.only(left: 3.sp),
                         child: Container(
                           alignment: Alignment.center,
-                          height: 35,
+                          height: 35.sp,
                           decoration: BoxDecoration(
                               color: Colors.red.withOpacity(.8),
                               borderRadius:
-                                  const BorderRadius.all(Radius.circular(100))),
+                                  BorderRadius.all(Radius.circular(100.sp))),
                           child: IconButton(
                             visualDensity: VisualDensity.compact,
                             onPressed: () {
@@ -80,11 +80,11 @@ class SavedViewRaw extends StatelessWidget {
                   );
                 },
                 separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(width: 5);
+                  return SizedBox(width: 5.sp);
                 },
               ),
             ),
-            const SizedBox(width: 5),
+            SizedBox(width: 5.sp),
             InkWell(
               onLongPress: () {
                 value.delAllItem();
@@ -92,9 +92,9 @@ class SavedViewRaw extends StatelessWidget {
                 showCustomSnackbar(context, "All Deleted", "Ok?");
               },
               child: Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10.sp),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.sp),
                   border: Border.all(
                     color: Theme.of(context).colorScheme.inversePrimary,
                   ),

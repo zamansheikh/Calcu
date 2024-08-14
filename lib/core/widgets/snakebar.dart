@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void showCustomSnackbar(
     BuildContext context, String content, String actionText) {
@@ -11,9 +12,9 @@ void showCustomSnackbar(
     ),
     backgroundColor: Theme.of(context).colorScheme.surface,
     behavior: SnackBarBehavior.floating,
-    margin: const EdgeInsets.all(10),
+    margin:  EdgeInsets.all(10.sp),
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(10.sp),
     ),
     duration: const Duration(milliseconds: 800),
     action: SnackBarAction(

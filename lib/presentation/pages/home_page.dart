@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/widgets/appbar.dart';
 import '../../core/widgets/button_row1.dart';
 import '../../core/widgets/button_row2.dart';
@@ -23,17 +24,17 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: const AppBarCustom(),
-      body: const Padding(
-        padding: EdgeInsets.all(8.0),
+      body: Padding(
+        padding: EdgeInsets.all(8.sp),
         child: Column(
           children: [
-            Expanded(flex: 2, child: InputViewRow()),
-            SizedBox(height: 10),
-            Expanded(child: ResultViewRow()),
-            SizedBox(height: 10),
-            Expanded(child: SavedViewRaw()),
-            SizedBox(height: 10),
-            Expanded(
+            const Expanded(flex: 2, child: InputViewRow()),
+            SizedBox(height: 10.sp),
+            const Expanded(child: ResultViewRow()),
+            SizedBox(height: 10.sp),
+            const Expanded(child: SavedViewRaw()),
+            SizedBox(height: 10.sp),
+            const Expanded(
               flex: 6,
               child: Column(
                 children: [

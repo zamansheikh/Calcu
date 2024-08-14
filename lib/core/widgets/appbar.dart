@@ -2,6 +2,7 @@ import 'package:calcu/core/constants/app_string.dart';
 import 'package:calcu/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class AppBarCustom extends StatefulWidget implements PreferredSizeWidget {
@@ -34,7 +35,7 @@ class _AppBarCustomState extends State<AppBarCustom> {
             builder: (context) {
               return AlertDialog(
                 title: Text(
-                  "About Calcu",
+                  "About Calcu App",
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.inversePrimary,
                   ),
@@ -43,12 +44,14 @@ class _AppBarCustomState extends State<AppBarCustom> {
                   AppString.aboutInfo,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.inversePrimary,
+                    fontSize: 18.sp,
                   ),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
+                      HapticFeedback.heavyImpact();
                     },
                     style: TextButton.styleFrom(
                         backgroundColor:
