@@ -36,7 +36,6 @@ class HomeProvider extends ChangeNotifier {
 
     if (loadedValues != null) {
       savedValue = loadedValues;
-      print(savedValue);
     }
     notifyListeners();
   }
