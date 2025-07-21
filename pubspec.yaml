@@ -1,7 +1,7 @@
 name: calcu
 description: A new Flutter project.
 publish_to: 'none' 
-version: 3.7.0+1
+version: 3.8.0+1
 
 environment:
   sdk: ^3.8.1
@@ -23,7 +23,7 @@ dependencies:
   provider: ^6.1.5
   flutter_screenutil: ^5.9.3
   math_expressions: ^3.0.0
-  package_info_plus: ^8.0.2
+  package_info_plus: ^8.3.0
 
 
 flutter_launcher_icons:
