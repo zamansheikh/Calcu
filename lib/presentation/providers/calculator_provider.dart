@@ -127,6 +127,13 @@ class CalculatorProvider extends ChangeNotifier {
   void _calculateExpression() {
     try {
       String expression = _preprocessExpression(_inputController.input);
+
+      // Handle modulo operations separately since math_expressions might not support %
+      if (expression.contains('%') && !expression.contains('/100')) {
+        _calculateWithModulo(expression);
+        return;
+      }
+
       ShuntingYardParser parser = ShuntingYardParser();
       Expression exp = parser.parse(expression);
 
@@ -147,6 +154,33 @@ class CalculatorProvider extends ChangeNotifier {
     }
   }
 
+  /// Calculate expressions with modulo operator
+  void _calculateWithModulo(String expression) {
+    try {
+      // Handle simple modulo cases like "8%9" or "8.5%3.2"
+      RegExp modRegex = RegExp(r'^(\d+(?:\.\d+)?)%(\d+(?:\.\d+)?)$');
+      Match? match = modRegex.firstMatch(expression);
+
+      if (match != null) {
+        double dividend = double.parse(match.group(1)!);
+        double divisor = double.parse(match.group(2)!);
+
+        if (divisor == 0) {
+          _output = 'Error';
+          return;
+        }
+
+        double result = dividend % divisor;
+        _output = _formatResult(result);
+      } else {
+        // For more complex expressions with modulo, try to evaluate parts
+        _output = 'Error';
+      }
+    } catch (e) {
+      _output = 'Error';
+    }
+  }
+
   /// Preprocess expression for calculation
   String _preprocessExpression(String input) {
     String processed = input;
@@ -157,10 +191,22 @@ class CalculatorProvider extends ChangeNotifier {
     processed = processed.replaceAll('π', '3.14159265359');
     processed = processed.replaceAll('e', '2.71828182846');
 
-    // Handle percentage - convert X% to (X/100)
+    // Handle percentage - convert X% to (X/100) - handle cases like 99%9 as (99/100)*9
     processed = processed.replaceAllMapped(
-      RegExp(r'(\d+(?:\.\d+)?)%'),
+      RegExp(r'(\d+(?:\.\d+)?)%(\d+(?:\.\d+)?)'),
+      (match) => '(${match.group(1)}/100)*${match.group(2)}',
+    );
+
+    // Handle standalone percentage - convert X% to (X/100)
+    processed = processed.replaceAllMapped(
+      RegExp(r'(\d+(?:\.\d+)?)%(?!\d)'),
       (match) => '(${match.group(1)}/100)',
+    );
+
+    // Handle modulo operator - convert Xmod(Y) to X%Y
+    processed = processed.replaceAllMapped(
+      RegExp(r'(\d+(?:\.\d+)?)mod\((\d+(?:\.\d+)?)\)'),
+      (match) => '${match.group(1)}%${match.group(2)}',
     );
 
     // Handle square root

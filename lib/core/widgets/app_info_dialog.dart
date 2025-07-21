@@ -267,11 +267,11 @@ class AppInfoDialog extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(
             context,
-          ).colorScheme.secondary.withValues(alpha: 0.15),
+          ).colorScheme.inversePrimary.withValues(alpha: 0.15),
           border: Border.all(
             color: Theme.of(
               context,
-            ).colorScheme.secondary.withValues(alpha: 0.5),
+            ).colorScheme.inversePrimary.withValues(alpha: 0.5),
             width: 1.5,
           ),
           borderRadius: BorderRadius.circular(12.sp),
@@ -280,7 +280,7 @@ class AppInfoDialog extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).colorScheme.inversePrimary,
               size: 20.sp,
             ),
             SizedBox(width: 12.sp),
@@ -288,7 +288,7 @@ class AppInfoDialog extends StatelessWidget {
               child: Text(
                 text,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: Theme.of(context).colorScheme.inversePrimary,
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
                 ),
@@ -296,7 +296,7 @@ class AppInfoDialog extends StatelessWidget {
             ),
             Icon(
               Icons.open_in_new,
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).colorScheme.inversePrimary,
               size: 16.sp,
             ),
           ],
