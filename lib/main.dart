@@ -1,5 +1,5 @@
-import 'package:calcu/presentation/pages/home_page.dart';
-import 'package:calcu/presentation/providers/home_provider.dart';
+import 'package:calcu/presentation/pages/enhanced_home_page.dart';
+import 'package:calcu/presentation/providers/calculator_provider.dart';
 import 'package:calcu/theme/app_theme.dart';
 import 'package:calcu/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +12,6 @@ void main() async {
 
   di.init();
 
-  // Initialize HomeProvider and call onInit
-  final homeProvider = di.sl<HomeProvider>();
-  homeProvider.onInit();
   runApp(const MyApp());
 }
 
@@ -24,26 +21,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-        designSize: const Size(412, 732),
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (_, child) {
-          return MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (_) => di.sl<HomeProvider>()),
-              ChangeNotifierProvider(create: (_) => di.sl<ThemeProvider>()),
-            ],
-            child: Consumer<ThemeProvider>(builder: (context, value, _) {
+      designSize: const Size(412, 732),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (_, child) {
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => CalculatorProvider()),
+            ChangeNotifierProvider(create: (_) => di.sl<ThemeProvider>()),
+          ],
+          child: Consumer<ThemeProvider>(
+            builder: (context, value, _) {
               return MaterialApp(
                 title: 'Calcu App',
                 theme: AppTheme.defalultTheme,
-                home: const HomePage(),
+                home: const EnhancedHomePage(),
                 themeMode: value.themeMode,
                 darkTheme: AppTheme.darkTheme,
                 debugShowCheckedModeBanner: false,
               );
-            }),
-          );
-        });
+            },
+          ),
+        );
+      },
+    );
   }
 }
