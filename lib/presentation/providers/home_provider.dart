@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 
@@ -292,27 +293,45 @@ class HomeProvider extends ChangeNotifier {
   void equalButtonLong() {
     if (input.isNotEmpty) {
       calculateFunction(input);
-      output = double.parse(output).toStringAsFixed(3);
+      // Only format output if it is a valid number
+      double? val = double.tryParse(output);
+      if (val != null) {
+        output = val.toStringAsFixed(3);
+      }
     }
     notifyListeners();
     HapticFeedback.vibrate();
   }
 
+  // Assuming you have this function and other necessary imports/class structure.
   void calculateFunction(String str) {
-    str = findAndReplace(str, 0);
+    // Your initial string replacements are fine.
+    // str = findAndReplace(str, 0); // Assuming you have this function defined elsewhere.
     str = str.replaceAll('x', '*');
     str = str.replaceAll('÷', '/');
     str = str.replaceAll('|', '%');
 
-    // Parser p = Parser();
-    // try {
-    //   Expression exp = p.parse(str);
-    //   ContextModel cm = ContextModel();
-    //   double result = exp.evaluate(EvaluationType.REAL, cm) as double;
-    //   output = result.toString();
-    // } catch (e) {
-    //   output = 'Wrong Input!';
-    // }
+    // The parser and context model creation remain the same.
+    ShuntingYardParser p = ShuntingYardParser();
+    ContextModel cm = ContextModel();
+
+    try {
+      // Parse the expression from the string.
+      Expression exp = p.parse(str);
+
+      // Create a RealEvaluator.
+      RealEvaluator evaluator = RealEvaluator();
+
+      // Use the evaluator's `eval` method instead of the deprecated one.
+      double result = evaluator.evaluate(exp).toDouble();
+
+      output = result.toString();
+    } catch (e) {
+      // It's a good practice to handle potential parsing or evaluation errors.
+      output = 'Invalid Input!';
+    }
+
+    // Notify listeners to update the UI, common in Flutter with providers.
     notifyListeners();
   }
 
