@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:math_expressions/math_expressions.dart';
 import 'package:flutter/services.dart';
 
 class HomeProvider extends ChangeNotifier {
@@ -30,7 +29,7 @@ class HomeProvider extends ChangeNotifier {
   bool equalIsClicked = false;
   List<int> parenthesis = [0, 0];
 
-  readData() async {
+  Future<void> readData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     List<String>? loadedValues = pref.getStringList('remvalu');
 
@@ -40,7 +39,7 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  writeData() async {
+  Future<void> writeData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     await pref.setStringList('remvalu', savedValue.toList());
     notifyListeners();
@@ -107,7 +106,7 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void pasteFromResult(var index) {
+  void pasteFromResult(int index) {
     if (input.contains('.')) {
       input += double.parse(savedValue[index]).toInt().toString();
     } else {
@@ -117,7 +116,7 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void delASingleItem(var index) {
+  void delASingleItem(int index) {
     savedValue.removeAt(index);
     HapticFeedback.vibrate();
     notifyListeners();
@@ -305,15 +304,15 @@ class HomeProvider extends ChangeNotifier {
     str = str.replaceAll('÷', '/');
     str = str.replaceAll('|', '%');
 
-    Parser p = Parser();
-    try {
-      Expression exp = p.parse(str);
-      ContextModel cm = ContextModel();
-      double result = exp.evaluate(EvaluationType.REAL, cm) as double;
-      output = result.toString();
-    } catch (e) {
-      output = 'Wrong Input!';
-    }
+    // Parser p = Parser();
+    // try {
+    //   Expression exp = p.parse(str);
+    //   ContextModel cm = ContextModel();
+    //   double result = exp.evaluate(EvaluationType.REAL, cm) as double;
+    //   output = result.toString();
+    // } catch (e) {
+    //   output = 'Wrong Input!';
+    // }
     notifyListeners();
   }
 
