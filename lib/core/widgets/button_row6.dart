@@ -36,7 +36,7 @@ class Buttonrow6 extends StatelessWidget {
             child: CustomButton(
               buttonName: "=",
               buttonColor:
-                  Theme.of(context).colorScheme.inversePrimary.withOpacity(.8),
+                  Theme.of(context).colorScheme.inversePrimary.withValues(alpha: 0.8),
               onPressed: () {
                 value.equalButton();
               },

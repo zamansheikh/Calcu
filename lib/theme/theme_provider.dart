@@ -25,8 +25,6 @@ class ThemeProvider with ChangeNotifier {
         final brightness =
             SchedulerBinding.instance.platformDispatcher.platformBrightness;
         return brightness == Brightness.dark;
-      default:
-        return false;
     }
   }
 
@@ -66,8 +64,6 @@ class ThemeProvider with ChangeNotifier {
       case ThemeMode.dark:
         return 'dark';
       case ThemeMode.system:
-        return 'system';
-      default:
         return 'system';
     }
   }

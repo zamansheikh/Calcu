@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class AppBarCustom extends StatefulWidget implements PreferredSizeWidget {
-  const AppBarCustom({Key? key}) : super(key: key);
+  const AppBarCustom({super.key});
 
   @override
   State<AppBarCustom> createState() => _AppBarCustomState();

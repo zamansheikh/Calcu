@@ -8,7 +8,7 @@ class AppColors {
   static const background = Color(0xff1A2947);
   static const black = Color(0xff000000);
   static const white = Color(0xffffffff);
-  static final fieldColor = const Color(0xffD9D9D9).withOpacity(.6);
+  static final fieldColor = const Color(0xffD9D9D9).withValues(alpha: .6);
   static const calcuBackground = Color(0xFF161A20);
   static const numButton = Color(0xFF242933);
   static const opButton = Color(0xFF0060E5);
