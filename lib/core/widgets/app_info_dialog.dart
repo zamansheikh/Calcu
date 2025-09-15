@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AppInfoDialog extends StatelessWidget {
-  const AppInfoDialog({super.key});
-
-  // Get version from pubspec (you can update this manually or use a build script)
-  static const String _version = '3.7.0';
-  static const String _buildNumber = '1';
-
+  const AppInfoDialog({super.key, required this.packageInfo});
+  final PackageInfo packageInfo;
   Future<void> _launchUrl(String url, BuildContext context) async {
     try {
       final Uri uri = Uri.parse(url);
@@ -94,7 +91,7 @@ class AppInfoDialog extends StatelessWidget {
                       ),
                       SizedBox(width: 8.sp),
                       Text(
-                        'Version $_version+$_buildNumber',
+                        'Version ${packageInfo.version}+${packageInfo.buildNumber}',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.inversePrimary,
                           fontSize: 16.sp,

@@ -2,6 +2,7 @@ import 'package:calcu/core/widgets/app_info_dialog.dart';
 import 'package:calcu/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 class AppBarCustom extends StatefulWidget implements PreferredSizeWidget {
@@ -22,17 +23,18 @@ class _AppBarCustomState extends State<AppBarCustom> {
       elevation: 0,
       title: Text(
         'Calcu',
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.inversePrimary,
-        ),
+        style: TextStyle(color: Theme.of(context).colorScheme.inversePrimary),
       ),
       leading: IconButton(
-        onPressed: () {
+        onPressed: () async {
           HapticFeedback.selectionClick();
-          showDialog(
-            context: context,
-            builder: (context) => const AppInfoDialog(),
-          );
+          PackageInfo packageInfo = await PackageInfo.fromPlatform();
+          if (context.mounted) {
+            showDialog(
+              context: context,
+              builder: (context) => AppInfoDialog(packageInfo: packageInfo),
+            );
+          }
         },
         icon: Icon(
           Icons.info,
@@ -40,20 +42,22 @@ class _AppBarCustomState extends State<AppBarCustom> {
         ),
       ),
       actions: [
-        Consumer<ThemeProvider>(builder: (context, themeService, _) {
-          return IconButton(
-            onPressed: () {
-              themeService.toggleTheme();
-              HapticFeedback.lightImpact();
-            },
-            icon: Icon(
-              context.watch<ThemeProvider>().isDarkMode
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
-              color: Theme.of(context).colorScheme.inversePrimary,
-            ),
-          );
-        }),
+        Consumer<ThemeProvider>(
+          builder: (context, themeService, _) {
+            return IconButton(
+              onPressed: () {
+                themeService.toggleTheme();
+                HapticFeedback.lightImpact();
+              },
+              icon: Icon(
+                context.watch<ThemeProvider>().isDarkMode
+                    ? Icons.light_mode
+                    : Icons.dark_mode,
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
+            );
+          },
+        ),
       ],
       centerTitle: true,
     );
