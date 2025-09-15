@@ -2,6 +2,7 @@ import 'package:calcu/presentation/providers/calculator_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
 class EnhancedInputView extends StatefulWidget {
   const EnhancedInputView({super.key});
@@ -14,6 +15,10 @@ class _EnhancedInputViewState extends State<EnhancedInputView>
     with TickerProviderStateMixin {
   late AnimationController _cursorController;
   bool _showCursor = false;
+  // Used to get the size for alignment math during hit-testing
+  final GlobalKey _containerKey = GlobalKey();
+  // Track horizontal scroll so hit-testing works when user scrolls
+  final ScrollController _hScrollController = ScrollController();
 
   @override
   void initState() {
@@ -28,6 +33,7 @@ class _EnhancedInputViewState extends State<EnhancedInputView>
   @override
   void dispose() {
     _cursorController.dispose();
+    _hScrollController.dispose();
     super.dispose();
   }
 
@@ -44,49 +50,83 @@ class _EnhancedInputViewState extends State<EnhancedInputView>
       return;
     }
 
-    // Get the exact tap position
-    final tapX = details.localPosition.dx - 8.sp; // Account for padding
+    // We render numbers with commas. Hit-test using the same formatted text
+    // and then map the position back to the raw, unformatted string.
+    final formatted = _addCommasToNumbers(input);
 
-    // Create a TextPainter to measure text accurately
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: input,
-        style: TextStyle(
-          fontSize: input.length > 15 ? 24.sp : 28.sp,
-          color: Theme.of(context).colorScheme.inversePrimary,
-          fontWeight: FontWeight.w400,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
+    // Build a TextPainter exactly like the display text
+    final textStyle = TextStyle(
+      fontSize: input.length > 15 ? 24.sp : 28.sp,
+      color: Theme.of(context).colorScheme.inversePrimary,
+      fontWeight: FontWeight.w400,
     );
-    textPainter.layout(maxWidth: double.infinity);
 
-    // Find the closest character position to the tap
-    int closestPosition = 0;
-    double closestDistance = double.infinity;
+    // Lay out the full text width (unconstrained) to get accurate glyph widths
+    final containerSize = _containerKey.currentContext?.size;
+    final horizontalPadding = 8.sp * 2; // left + right padding from Container
+    final containerWidth = (containerSize?.width ?? 0).clamp(
+      0.0,
+      double.infinity,
+    );
+    final leftPadding = 8.sp;
 
-    for (int i = 0; i <= input.length; i++) {
-      final offset = textPainter.getOffsetForCaret(
-        TextPosition(offset: i),
-        Rect.zero,
-      );
+    final painter = TextPainter(
+      text: TextSpan(text: formatted, style: textStyle),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout(maxWidth: double.infinity);
 
-      final distance = (offset.dx - tapX).abs();
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestPosition = i;
-      }
+    final textWidth = painter.width;
+
+    // Convert tap x from viewport space to full text space.
+    // Read precise viewport width from the scroll controller when available.
+    final hasClients = _hScrollController.hasClients;
+    final viewportWidth = hasClients
+        ? _hScrollController.position.viewportDimension
+        : math.max(0.0, containerWidth - horizontalPadding);
+    final localXInViewport = (details.localPosition.dx - leftPadding).clamp(
+      0.0,
+      viewportWidth,
+    );
+
+    // With reverse: true, pixels increase as you reveal earlier content.
+    final pixels = hasClients ? _hScrollController.position.pixels : 0.0;
+    final maxHiddenOnLeft = textWidth > viewportWidth
+        ? (textWidth - viewportWidth)
+        : 0.0;
+    // Visible left = maxHiddenOnLeft - pixels (clamped)
+    final viewportLeftInTextSpace = (maxHiddenOnLeft - pixels).clamp(
+      0.0,
+      maxHiddenOnLeft,
+    );
+    final xInTextSpace = (viewportLeftInTextSpace + localXInViewport).clamp(
+      0.0,
+      textWidth,
+    );
+
+    // Get the caret position at this x within the full text
+    final posInFormatted = painter
+        .getPositionForOffset(Offset(xInTextSpace, 0))
+        .offset;
+
+    // Map formatted index back to raw index (skip commas)
+    int rawIndex = 0;
+    for (int i = 0; i < posInFormatted && i < formatted.length; i++) {
+      if (formatted[i] != ',') rawIndex++;
     }
+    // If tapped at/after the end, clamp to raw length
+    rawIndex = rawIndex.clamp(0, input.length);
 
-    // Set the cursor position
-    provider.inputController.setCursorPosition(closestPosition);
+    provider.inputController.setCursorPosition(rawIndex);
     setState(() {
       _showCursor = true;
     });
 
-    // Start cursor animation
-    _cursorController.reset();
-    _cursorController.repeat();
+    // Restart cursor animation for visibility feedback
+    _cursorController
+      ..reset()
+      ..repeat();
   }
 
   String _addCommasToNumbers(String input) {
@@ -112,6 +152,7 @@ class _EnhancedInputViewState extends State<EnhancedInputView>
             );
           },
           child: Container(
+            key: _containerKey,
             width: double.infinity,
             alignment: Alignment.bottomRight,
             padding: EdgeInsets.all(8.sp),
@@ -123,6 +164,7 @@ class _EnhancedInputViewState extends State<EnhancedInputView>
             ),
             child: SingleChildScrollView(
               reverse: true,
+              controller: _hScrollController,
               scrollDirection: Axis.horizontal,
               child: _buildDisplayText(context, calculatorProvider),
             ),
