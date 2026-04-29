@@ -124,7 +124,7 @@ class ThemeCatalog {
     description: 'Deep purples and electric violet — for night-owl math.',
     previewColor: const Color(0xFF8B5CF6),
     isPremium: true,
-    priceLabel: '\$0.99',
+    priceLabel: '\$0.20',
     lightPalette: const CalcuPalette(
       background: Color(0xFFF7F5FB),
       surface: Color(0xFFFFFFFF),
@@ -188,7 +188,7 @@ class ThemeCatalog {
     description: 'Warm amber and coral — energetic and inviting.',
     previewColor: const Color(0xFFF97316),
     isPremium: true,
-    priceLabel: '\$0.99',
+    priceLabel: '\$0.25',
     lightPalette: const CalcuPalette(
       background: Color(0xFFFFF7F0),
       surface: Color(0xFFFFFFFF),
@@ -252,7 +252,7 @@ class ThemeCatalog {
     description: 'Calm greens — focused and grounded.',
     previewColor: const Color(0xFF059669),
     isPremium: true,
-    priceLabel: '\$0.99',
+    priceLabel: '\$0.25',
     lightPalette: const CalcuPalette(
       background: Color(0xFFF1F8F4),
       surface: Color(0xFFFFFFFF),
@@ -316,7 +316,7 @@ class ThemeCatalog {
     description: 'Cool teals and crisp cyan — fresh and modern.',
     previewColor: const Color(0xFF0891B2),
     isPremium: true,
-    priceLabel: '\$1.99',
+    priceLabel: '\$0.30',
     lightPalette: const CalcuPalette(
       background: Color(0xFFF0F9FB),
       surface: Color(0xFFFFFFFF),
@@ -380,7 +380,7 @@ class ThemeCatalog {
     description: 'Pure grayscale — minimalist and timeless.',
     previewColor: const Color(0xFF1F2937),
     isPremium: true,
-    priceLabel: '\$1.99',
+    priceLabel: '\$0.30',
     lightPalette: const CalcuPalette(
       background: Color(0xFFF5F5F5),
       surface: Color(0xFFFFFFFF),

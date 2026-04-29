@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/services/billing_service.dart';
 import '../../theme/calcu_palette.dart';
 import '../../theme/theme_catalog.dart';
 import '../providers/theme_provider.dart';
@@ -26,31 +27,47 @@ class ThemeStorePage extends StatelessWidget {
         child: SafeArea(
           child: Consumer<ThemeProvider>(
             builder: (context, theme, _) {
-              return CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  SliverToBoxAdapter(child: _Header(palette: palette)),
-                  SliverPadding(
-                    padding: EdgeInsets.fromLTRB(16.r, 8.r, 16.r, 16.r),
-                    sliver: SliverList.separated(
-                      itemCount: theme.packs.length,
-                      separatorBuilder: (context, index) =>
-                          SizedBox(height: 12.r),
-                      itemBuilder: (context, index) {
-                        final pack = theme.packs[index];
-                        return ThemePackTile(
-                          pack: pack,
-                          isOwned: theme.isOwned(pack.id),
-                          isActive: theme.activePackId == pack.id,
-                          useDarkPreview: theme.isDarkMode,
-                          onUse: () => _applyPack(context, theme, pack),
-                          onPurchase: () =>
-                              _purchasePack(context, theme, pack),
-                        );
-                      },
-                    ),
+              _drainStatusMessages(context, theme);
+              return Stack(
+                children: [
+                  CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      SliverToBoxAdapter(child: _Header(palette: palette)),
+                      SliverPadding(
+                        padding: EdgeInsets.fromLTRB(16.r, 8.r, 16.r, 16.r),
+                        sliver: SliverList.separated(
+                          itemCount: theme.packs.length,
+                          separatorBuilder: (context, index) =>
+                              SizedBox(height: 12.r),
+                          itemBuilder: (context, index) {
+                            final pack = theme.packs[index];
+                            return ThemePackTile(
+                              pack: pack,
+                              priceLabel: theme.priceLabel(pack),
+                              isOwned: theme.isOwned(pack.id),
+                              isActive: theme.activePackId == pack.id,
+                              useDarkPreview: theme.isDarkMode,
+                              onUse: () => _applyPack(context, theme, pack),
+                              onPurchase: () =>
+                                  _purchasePack(context, theme, pack),
+                            );
+                          },
+                        ),
+                      ),
+                      if (theme.isStoreConfigured)
+                        SliverToBoxAdapter(
+                          child: _RestoreSection(
+                            palette: palette,
+                            isBusy: theme.isBusy,
+                            onRestore: () => _restore(context, theme),
+                          ),
+                        ),
+                      SliverToBoxAdapter(child: _Footer(palette: palette)),
+                    ],
                   ),
-                  SliverToBoxAdapter(child: _Footer(palette: palette)),
+                  if (theme.isBusy)
+                    const Positioned.fill(child: _BusyOverlay()),
                 ],
               );
             },
@@ -58,6 +75,17 @@ class ThemeStorePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _drainStatusMessages(BuildContext context, ThemeProvider theme) {
+    final msg = theme.consumeStatusMessage();
+    if (msg == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(msg)));
+    });
   }
 
   void _applyPack(
@@ -76,15 +104,17 @@ class ThemeStorePage extends StatelessWidget {
     ThemeProvider theme,
     ThemePack pack,
   ) async {
+    final priceLabel = theme.priceLabel(pack);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text('Unlock ${pack.name}'),
         content: Text(
-          pack.priceLabel == null
-              ? 'Add ${pack.name} to your library?'
-              : 'Unlock ${pack.name} for ${pack.priceLabel}? '
-                  'Billing is mocked in this build — no charge will be made.',
+          theme.isStoreConfigured
+              ? 'Continue to checkout? You will be charged '
+                  '${priceLabel ?? 'the listed price'}.'
+              : 'Add ${pack.name} to your library? '
+                  '(billing is mocked locally — no charge)',
         ),
         actions: [
           TextButton(
@@ -93,18 +123,37 @@ class ThemeStorePage extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Unlock'),
+            child: Text(theme.isStoreConfigured ? 'Continue' : 'Unlock'),
           ),
         ],
       ),
     );
     if (confirmed != true) return;
-    final ok = await theme.purchasePack(pack.id);
-    if (!ok || !context.mounted) return;
-    theme.selectPack(pack.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${pack.name} unlocked & applied')),
-    );
+
+    try {
+      final ok = await theme.purchasePack(pack.id);
+      if (!ok || !context.mounted) return;
+      theme.selectPack(pack.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${pack.name} unlocked & applied')),
+      );
+    } on BillingException catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Purchase failed: ${e.message}')),
+      );
+    }
+  }
+
+  Future<void> _restore(BuildContext context, ThemeProvider theme) async {
+    try {
+      await theme.restorePurchases();
+    } on BillingException catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Restore failed: ${e.message}')),
+      );
+    }
   }
 }
 
@@ -141,8 +190,9 @@ class _Header extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.r),
             child: Text(
-              'Customise Calcu with curated themes. Owned packs apply instantly; '
-              'premium packs ship with a one-time unlock.',
+              'Customise Calcu with curated themes. Purchases unlock instantly '
+              'and stay on your account — restore them on any device you sign '
+              'in to.',
               style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 13.sp,
@@ -158,6 +208,45 @@ class _Header extends StatelessWidget {
   }
 }
 
+class _RestoreSection extends StatelessWidget {
+  const _RestoreSection({
+    required this.palette,
+    required this.isBusy,
+    required this.onRestore,
+  });
+
+  final CalcuPalette palette;
+  final bool isBusy;
+  final VoidCallback onRestore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.r, 4.r, 20.r, 0),
+      child: OutlinedButton.icon(
+        onPressed: isBusy ? null : onRestore,
+        icon: Icon(Icons.restore, size: 18.sp, color: palette.accent),
+        label: Text(
+          'Restore purchases',
+          style: TextStyle(
+            fontFamily: 'Urbanist',
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w700,
+            color: palette.accent,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          minimumSize: Size(double.infinity, 48.r),
+          side: BorderSide(color: palette.border),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14.r),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _Footer extends StatelessWidget {
   const _Footer({required this.palette});
   final CalcuPalette palette;
@@ -165,7 +254,7 @@ class _Footer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(20.r, 8.r, 20.r, 24.r),
+      padding: EdgeInsets.fromLTRB(20.r, 12.r, 20.r, 24.r),
       child: Container(
         padding: EdgeInsets.all(14.r),
         decoration: BoxDecoration(
@@ -180,8 +269,8 @@ class _Footer extends StatelessWidget {
             SizedBox(width: 10.r),
             Expanded(
               child: Text(
-                'Premium themes are stubbed for local testing. Wire the platform '
-                'billing API into ThemeProvider.purchasePack to ship real IAP.',
+                'Payments are processed by your store provider. Refunds and '
+                'subscription changes are handled there too.',
                 style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 11.sp,
@@ -191,6 +280,46 @@ class _Footer extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BusyOverlay extends StatelessWidget {
+  const _BusyOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: Colors.black26,
+      child: Center(
+        child: Container(
+          padding: EdgeInsets.all(20.r),
+          decoration: BoxDecoration(
+            color: context.palette.surfaceElevated,
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 20.r,
+                height: 20.r,
+                child: const CircularProgressIndicator(strokeWidth: 2),
+              ),
+              SizedBox(width: 12.r),
+              Text(
+                'Working…',
+                style: TextStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: context.palette.expressionText,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

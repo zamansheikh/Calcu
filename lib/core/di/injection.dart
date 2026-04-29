@@ -4,6 +4,7 @@ import '../../data/repositories/saved_values_repository.dart';
 import '../../data/repositories/theme_repository.dart';
 import '../../presentation/providers/calculator_provider.dart';
 import '../../presentation/providers/theme_provider.dart';
+import '../services/billing_service.dart';
 import '../services/calculator_engine.dart';
 import '../services/storage_service.dart';
 
@@ -24,6 +25,9 @@ Future<void> configureDependencies() async {
   sl.registerLazySingleton<ThemeRepository>(
     () => ThemeRepository(sl<StorageService>()),
   );
+  sl.registerLazySingleton<BillingService>(
+    () => BillingService(sl<ThemeRepository>()),
+  );
 
   sl.registerFactory<CalculatorProvider>(
     () => CalculatorProvider(
@@ -32,6 +36,9 @@ Future<void> configureDependencies() async {
     ),
   );
   sl.registerFactory<ThemeProvider>(
-    () => ThemeProvider(sl<ThemeRepository>()),
+    () => ThemeProvider(
+      repository: sl<ThemeRepository>(),
+      billing: sl<BillingService>(),
+    ),
   );
 }

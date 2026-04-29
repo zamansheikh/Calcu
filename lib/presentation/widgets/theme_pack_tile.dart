@@ -16,6 +16,7 @@ class ThemePackTile extends StatelessWidget {
     required this.useDarkPreview,
     required this.onUse,
     required this.onPurchase,
+    this.priceLabel,
   });
 
   final ThemePack pack;
@@ -24,6 +25,9 @@ class ThemePackTile extends StatelessWidget {
   final bool useDarkPreview;
   final VoidCallback onUse;
   final VoidCallback onPurchase;
+
+  /// Resolved price (live store price preferred, catalog default otherwise).
+  final String? priceLabel;
 
   CalcuPalette get _preview =>
       useDarkPreview ? pack.darkPalette : pack.lightPalette;
@@ -106,6 +110,7 @@ class ThemePackTile extends StatelessWidget {
                     isActive: isActive,
                     isOwned: isOwned,
                     pack: pack,
+                    priceLabel: priceLabel,
                     shellPalette: shellPalette,
                     onUse: onUse,
                     onPurchase: onPurchase,
@@ -198,11 +203,13 @@ class _ActionPill extends StatelessWidget {
     required this.shellPalette,
     required this.onUse,
     required this.onPurchase,
+    this.priceLabel,
   });
 
   final bool isActive;
   final bool isOwned;
   final ThemePack pack;
+  final String? priceLabel;
   final CalcuPalette shellPalette;
   final VoidCallback onUse;
   final VoidCallback onPurchase;
@@ -228,11 +235,12 @@ class _ActionPill extends StatelessWidget {
         onTap: onUse,
       );
     }
+    final price = priceLabel ?? pack.priceLabel ?? '';
     return _Pill(
       background: pack.previewColor,
       foreground: Colors.white,
       icon: Icons.lock_open_rounded,
-      label: 'Buy ${pack.priceLabel ?? ''}'.trim(),
+      label: price.isEmpty ? 'Buy' : 'Buy $price',
       onTap: onPurchase,
     );
   }

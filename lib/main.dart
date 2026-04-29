@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'app.dart';
 import 'core/di/injection.dart';
+import 'core/services/billing_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,5 +11,6 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
   ]);
   await configureDependencies();
+  await sl<BillingService>().initialize();
   runApp(const CalcuApp());
 }

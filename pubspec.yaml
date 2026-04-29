@@ -24,6 +24,7 @@ dependencies:
   flutter_screenutil: ^5.9.3
   math_expressions: ^3.0.0
   package_info_plus: ^10.1.0
+  purchases_flutter: ^10.0.1
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
