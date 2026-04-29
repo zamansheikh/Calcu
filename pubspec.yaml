@@ -1,5 +1,5 @@
 name: calcu
-description: A new Flutter project.
+description:  Calcu is a simple calculator app built with Flutter. It provides basic arithmetic operations and a user-friendly interface for quick calculations.
 publish_to: 'none' 
 version: 3.9.0+21
 
@@ -24,57 +24,17 @@ dependencies:
   flutter_screenutil: ^5.9.3
   math_expressions: ^3.0.0
   package_info_plus: ^10.1.0
-
-
-flutter_launcher_icons:
-  #  image_path: "assets/images/icon-128x128.png"
-  image_path_android: "assets/icon/ic_launcher.png"
-  image_path_ios: "assets/icon/AppIcon~ios-marketing.png"
-  android: true # can specify file name here e.g. "ic_launcher"
-  ios: true # can specify file name here e.g. "My-Launcher-Icon"
-  adaptive_icon_background: "assets/icon/ic_launcher_background.png" # only available for Android 8.0 devices and above
-  adaptive_icon_foreground: "assets/icon/ic_launcher_foreground.png" # only available for Android 8.0 devices and above
-  min_sdk_android: 21 # android min sdk min:16, default 21
-  remove_alpha_ios: true
-  background_color_ios: "#ffffff"
-  web:
-    generate: false
-    image_path: "assets/images/icon-1024x1024.png"
-    background_color: "#hexcode"
-    theme_color: "#hexcode"
-  windows:
-    generate: false
-    image_path: "assets/images/icon-1024x1024.png"
-    icon_size: 48 # min:48, max:256, default: 48
-  macos:
-    generate: false
-    image_path: "assets/images/icon-1024x1024.png"
-  
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^6.0.0
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
 
-# The following section is specific to Flutter packages.
 flutter:
 
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
@@ -83,19 +43,7 @@ flutter:
     - assets/temp/
     - assets/svg/
     - assets/icon/
-  #   - images/a_dot_ham.jpeg
 
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/assets-and-images/#from-packages
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
   fonts:
     - family: Urbanist
       fonts:
@@ -115,11 +63,3 @@ flutter:
           weight: 400
         - asset: assets/fonts/Urbanist-SemiBold.ttf
           weight: 600
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
