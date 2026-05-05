@@ -1,7 +1,7 @@
 name: calcu
-description:  Calcu is a simple calculator app built with Flutter. It provides basic arithmetic operations and a user-friendly interface for quick calculations.
-publish_to: 'none' 
-version: 3.9.0+21
+description: Calcu is a simple calculator app built with Flutter. It provides basic arithmetic operations and a user-friendly interface for quick calculations.
+publish_to: "none"
+version: 4.0.0+23
 
 environment:
   sdk: ^3.8.1
@@ -33,9 +33,7 @@ dev_dependencies:
 
   flutter_lints: ^6.0.0
 
-
 flutter:
-
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:

@@ -22,7 +22,7 @@ class BillingConfig {
   BillingConfig._();
 
   /// Public RevenueCat key for Android. Empty means "use local mock".
-  static const String androidApiKey = '';
+  static const String androidApiKey = 'goog_OqaSfeZqbkqONjuDGkJVWoXtuxb';
 
   /// Public RevenueCat key for iOS.
   static const String iosApiKey = '';
