@@ -105,7 +105,7 @@ Youtube Tutorial 😁
 >**Warning**
 
 >Except for the source code licensed under the GPLv3 license,
->all other parties are prohibited from using Calcu's name as a downloader app,
+>all other parties are prohibited from using Calcu's name for their own app,
 >and the same is true for Calcu's derivatives.
 >Derivatives include but are not limited to forks and unofficial builds.
 
