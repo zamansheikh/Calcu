@@ -22,7 +22,7 @@ class ThemeProvider extends ChangeNotifier {
     _mode = _repository.readMode();
     _activePackId = _repository.readActivePackId();
     _ownedIds = {ThemePackId.classic, ..._repository.readOwnedPackIds()};
-    if (!_ownedIds.contains(_activePackId)) {
+    if (!isOwned(_activePackId)) {
       _activePackId = ThemeCatalog.defaultId;
     }
     _entitlementsSubscription = _billing.entitlementUpdates.listen(
@@ -76,8 +76,10 @@ class ThemeProvider extends ChangeNotifier {
     }
   }
 
+  /// Whether the user may apply [packId]: every free pack, and each premium
+  /// pack they have bought.
   bool isOwned(String packId) =>
-      packId == ThemePackId.classic || _ownedIds.contains(packId);
+      !ThemeCatalog.byId(packId).isPremium || _ownedIds.contains(packId);
 
   /// Returns the live store price if available, else the catalog default.
   String? priceLabel(ThemePack pack) {
@@ -168,7 +170,7 @@ class ThemeProvider extends ChangeNotifier {
     // Persist a local copy so a cold start without network still shows the
     // right "owned" state until RevenueCat catches up.
     _repository.writeOwnedPackIds(_ownedIds);
-    if (!_ownedIds.contains(_activePackId)) {
+    if (!isOwned(_activePackId)) {
       _activePackId = ThemeCatalog.defaultId;
       _repository.writeActivePackId(_activePackId);
     }

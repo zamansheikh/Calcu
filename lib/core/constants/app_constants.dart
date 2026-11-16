@@ -5,6 +5,7 @@ class AppConstants {
   static const String tagline = 'A featuristic calculator for everyone';
   static const String developerName = 'Zaman Sheikh';
   static const String githubUrl = 'https://github.com/zamansheikh';
+  static const String facebookUrl = 'https://www.facebook.com/zamansheikh.404';
   static const String repoUrl = 'https://github.com/zamansheikh/Calcu';
   static const String telegramUrl = 'https://t.me/programmernexus';
   static const String donateUrl = 'https://www.buymeacoffee.com/zamansheikh';

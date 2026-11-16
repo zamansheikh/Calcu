@@ -137,6 +137,10 @@ class CalculatorProvider extends ChangeNotifier {
 
   void moveCursor(int position) => _input.moveCursorTo(position);
 
+  /// Replace the whole expression with [source], caret at the end. Unlike
+  /// typing, this is silent: no haptics.
+  void loadExpression(String source) => _input.setText(source);
+
   // ----------------------------------------------------------- Calculations
   /// `=`. The first press settles the result; each press after that, until
   /// the expression is edited, shows it in the next [ResultFormat].

@@ -1,0 +1,16 @@
+# Launcher icons. The artwork is drawn by tool/icon/make.py; run
+# tool/icon/build.sh to redraw it and regenerate everything below.
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  remove_alpha_ios: true
+  min_sdk_android: 21
+
+  # Pre-Android-8 launchers draw this image as it is, so it has its own
+  # rounded shape. iOS masks a full-bleed square itself.
+  image_path_android: "assets/icon/ic_launcher.png"
+  image_path_ios: "assets/icon/AppIcon~ios-marketing.png"
+
+  adaptive_icon_background: "assets/icon/ic_launcher_background.png"
+  adaptive_icon_foreground: "assets/icon/ic_launcher_foreground.png"
+  adaptive_icon_monochrome: "assets/icon/ic_launcher_monochrome.png"

@@ -1,26 +1,22 @@
-## Getting Started
-
 <div align="center">
 
-<img width="" src="assets/icon/ic_launcher.png"  width=160 height=160  align="center">
+<img src="docs/icon.png" alt="Calcu icon" width="150" height="150">
 
 # Calcu
 
-### A Featuristic basic Calculator app for all
-
-
-English
-&nbsp;&nbsp;
+### The calculator that writes math the way you do
 
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/zamansheikh/Calcu?color=black&label=Stable&logo=github)](https://github.com/zamansheikh/Calcu/releases/latest/)
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/zamansheikh/Calcu?include_prereleases&label=Preview&logo=Github)](https://github.com/zamansheikh/Calcu/releases/)
-[![Keep a Changelog](https://img.shields.io/badge/Changelog-lightgray?style=flat&color=gray&logo=keep-a-changelog)](https://github.com/zamansheikh/Calcu/blob/main/CHANGELOG.md)
 [![GitHub all releases](https://img.shields.io/github/downloads/zamansheikh/Calcu/total?label=Downloads&logo=github)](https://github.com/zamansheikh/Calcu/releases/)
 [![GitHub Repo stars](https://img.shields.io/github/stars/zamansheikh/Calcu?color=informational&label=Stars)](https://github.com/zamansheikh/Calcu)
-[![Supported Sites](https://img.shields.io/badge/Supported-Sites-9cf.svg?style=flat)](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md)
-[![Telegram Channel](https://img.shields.io/badge/Telegram-deCodersFamily-blue?style=flat&logo=telegram)](https://t.me/decodersfamily)
+[![Google Play](https://img.shields.io/badge/Google_Play-Calcu-0A60E6?style=flat&logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.decodersfamily.calcu)
+[![Telegram Channel](https://img.shields.io/badge/Telegram-Programmer_Nexus-blue?style=flat&logo=telegram)](https://t.me/programmernexus)
 
+<br>
+
+<img src="docs/showcase.jpg" alt="Calcu, the calculator that writes math the way you do" width="100%">
 
 </div>
 
@@ -28,37 +24,39 @@ English
 ## 📱 Screenshots
 
 <div align="center">
-<div>
-  <img src="assets/mockup/1.jpg" width="100%" />
+  <img src="docs/screenshots/01-natural-display.jpg" alt="Math, the way you write it" width="24%">
+  <img src="docs/screenshots/02-answer-forms.jpg" alt="One answer, three forms" width="24%">
+  <img src="docs/screenshots/03-functions.jpg" alt="Logs, roots, absolute values" width="24%">
+  <img src="docs/screenshots/04-huge-numbers.jpg" alt="Huge numbers, no more Error" width="24%">
 </div>
-<div>
-  <img src="assets/mockup/2.jpg" width="100%" />
-</div>
+<div align="center">
+  <img src="docs/screenshots/05-saved-results.jpg" alt="Save a result, reuse the sum" width="24%">
+  <img src="docs/screenshots/06-themes.jpg" alt="Nine themes, swipe to try" width="24%">
+  <img src="docs/screenshots/07-light-and-dark.jpg" alt="Clean in light, calm in dark" width="24%">
+  <img src="docs/screenshots/08-your-style.jpg" alt="A look for every mood" width="24%">
 </div>
 
 <br>
 
 ## 📖 Features
 
-- This calculator offers more than just simplicity—it brings innovation to your fingertips. 
+- **Natural display.** Fractions stack, exponents rise and roots get their bar as you type, so the screen shows the sum the way it looks on paper. Tap anywhere in it to edit.
 
-- Unlock unique features by utilizing long-press gestures on specific buttons: hold down the '=' button for a precise 3-decimal result.
+- **Three answer forms.** Press `=` again to switch between the decimal, the exact form (a fraction, a root or a multiple of π) and a value rounded to three places.
 
-- Do the same on the '%' button to reveal a remainder. 
+- **Scientific keys.** Powers, roots, logarithms to any base, natural log, absolute value, percent, modulo, π and e.
 
-- The result display window becomes a powerful tool when long-press on results, it saves your result in a colorful button.
+- **Huge numbers.** Results far beyond the usual limit are answered in scientific form instead of an error: `999^99999` is about 3.54 × 10^299953.
 
-- Access your saved results with a tap, or remove them by long-pressing the button. 
+- **Saved results.** Hold a result to keep it, along with the equation it came from. Tap either half of a saved chip to paste the answer or the whole equation back. Hold a chip to remove it, with a few seconds to undo.
 
-- Remove all save results by long-pressing the 'i' button. 
+- **Nine themes.** Classic, Rose, Sand and Citrus are free; Midnight, Sunset, Forest, Ocean and Monochrome are premium. Each has a light and a dark side, and you can swipe through a live preview of the calculator in every one before choosing.
 
-- No Ads
+- **Handy shortcuts.** Hold `⌫` to keep deleting, hold `%` for mod, hold `log` for ln, hold `π` for e, and hold the info button to clear every saved value.
 
-- Easy to use and user-friendly.
+- No ads.
 
-- [Material Design 3](https://m3.material.io/) style UI, with dynamic color theme.
-
-- MAD: UI and logic written with pure Kotlin. Single activity, no fragments, only composable destinations.
+- Built with [Flutter](https://flutter.dev/), in a [Material Design 3](https://m3.material.io/) style.
 
 
 
@@ -71,7 +69,7 @@ English
 
 ## 💬 Contact
 
-Join our [Telegram Channel](https://t.me/decodersfamily) for discussion, announcements, and releases!
+Join our [Telegram Channel](https://t.me/programmernexus) for discussion, announcements, and releases!
 
 ## 💖 Sponsors
 

@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/calcu_palette.dart';
 import '../widgets/app_top_bar.dart';
-import '../widgets/button_grid.dart';
-import '../widgets/expression_display.dart';
-import '../widgets/keypad_toolbar.dart';
-import '../widgets/result_display.dart';
+import '../widgets/calculator_body.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -55,36 +51,7 @@ class _HomePageState extends State<HomePage>
             child: Column(
               children: [
                 const AppTopBar(),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.r),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          flex: 6,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10.r),
-                            child: const ExpressionDisplay(),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 3,
-                          child: const ResultDisplay(),
-                        ),
-                        SizedBox(height: 6.r),
-                        const KeypadToolbar(),
-                        SizedBox(height: 8.r),
-                        Expanded(
-                          flex: 15,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 4.r),
-                            child: const ButtonGrid(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                const Expanded(child: CalculatorBody()),
               ],
             ),
           ),

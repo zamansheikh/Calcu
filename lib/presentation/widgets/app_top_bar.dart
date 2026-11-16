@@ -5,11 +5,11 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 import '../../theme/calcu_palette.dart';
+import '../pages/about_page.dart';
 import '../pages/theme_store_page.dart';
 import '../providers/calculator_provider.dart';
 import '../providers/theme_provider.dart';
 import 'animated_tap.dart';
-import 'app_info_dialog.dart';
 
 /// Custom top bar replacing AppBar — gives finer control over spacing,
 /// gradients, and the theme toggle's animation.
@@ -93,9 +93,10 @@ class AppTopBar extends StatelessWidget {
     HapticFeedback.selectionClick();
     final info = await PackageInfo.fromPlatform();
     if (!context.mounted) return;
-    showDialog<void>(
-      context: context,
-      builder: (_) => AppInfoDialog(packageInfo: info),
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => AboutPage(packageInfo: info),
+      ),
     );
   }
 
