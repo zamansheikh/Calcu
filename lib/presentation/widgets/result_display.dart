@@ -21,9 +21,11 @@ class ResultDisplay extends StatelessWidget {
       builder: (context, calc, _) {
         final raw = calc.output;
         final showPlaceholder = raw.isEmpty;
+        // A closed form (¾) and a number in scientific form (3.6×10^40)
+        // are both expression source, and are typeset rather than printed.
         final isMath = !showPlaceholder &&
             !calc.hasError &&
-            calc.resultFormat == ResultFormat.fraction;
+            (calc.resultFormat == ResultFormat.fraction || raw.contains('^'));
         final formatted = showPlaceholder
             ? '0'
             : NumberFormatter.addThousandsSeparators(raw);

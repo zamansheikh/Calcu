@@ -14,15 +14,15 @@ abstract final class ExactForm {
     final x = value.abs();
     final sign = value < 0 ? '-' : '';
 
-    final rational = _rational(x, maxDenominator: 10000, noise: 1e-14);
-    if (rational != null) {
-      if (rational.q == 1) return null;
-      return '${sign}frac(${rational.p},${rational.q})';
+    final fraction = rational(x, maxDenominator: 10000, noise: 1e-14);
+    if (fraction != null) {
+      if (fraction.q == 1) return null;
+      return '${sign}frac(${fraction.p},${fraction.q})';
     }
 
     // A square root of a fraction: √(p/q) = √(p·q) / q.
     // Squaring and dividing each roughly double the relative error.
-    final square = _rational(x * x, maxDenominator: 1000, noise: 4e-14);
+    final square = rational(x * x, maxDenominator: 1000, noise: 4e-14);
     if (square != null && square.p <= 1000000) {
       var inside = square.p * square.q;
       var outside = 1;
@@ -41,7 +41,7 @@ abstract final class ExactForm {
     }
 
     // A fraction of π.
-    final turns = _rational(x / math.pi, maxDenominator: 1000, noise: 2e-14);
+    final turns = rational(x / math.pi, maxDenominator: 1000, noise: 2e-14);
     if (turns != null && turns.p <= 1000) {
       return sign + _over(_times(turns.p, 'π'), turns.q);
     }
@@ -56,6 +56,7 @@ abstract final class ExactForm {
       denominator == 1 ? numerator : 'frac($numerator,$denominator)';
 
   /// The fraction p/q that [x] is, if it is one, by continued fractions.
+  /// [x] must not be negative.
   ///
   /// "Is one" has to be strict. Every number is *near* some fraction, so a
   /// match only counts when it is as close as floating-point [noise] (a
@@ -65,12 +66,13 @@ abstract final class ExactForm {
   /// probability about `tolerance × limit²`, held here to one in a million.
   /// Large values carry less precision after the decimal point, so they are
   /// allowed smaller denominators.
-  static ({int p, int q})? _rational(
+  static ({int p, int q})? rational(
     double x, {
     required int maxDenominator,
     required double noise,
   }) {
-    final tolerance = math.max(1.0, x) * noise;
+    // Relative, so that a very small number is not "close to" zero.
+    final tolerance = x * noise;
     final limit = math.min(
       maxDenominator.toDouble(),
       math.sqrt(1e-6 / tolerance),

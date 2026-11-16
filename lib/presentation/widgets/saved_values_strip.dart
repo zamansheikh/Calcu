@@ -183,15 +183,24 @@ class _SavedChip extends StatelessWidget {
         color: textColor.withValues(alpha: 0.55),
       ),
     );
-    final value = Text(
-      NumberFormatter.addThousandsSeparators(entry.value),
-      style: TextStyle(
-        fontFamily: 'Urbanist',
-        fontSize: 15.sp,
-        fontWeight: FontWeight.w700,
-        color: textColor,
-      ),
-    );
+    // A result in scientific form (3.6×10^40) is typeset; a plain number is
+    // printed.
+    final Widget value = entry.value.contains('^')
+        ? MathLabel(
+            entry.value,
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w700,
+            color: textColor,
+          )
+        : Text(
+            NumberFormatter.addThousandsSeparators(entry.value),
+            style: TextStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
+          );
 
     return Container(
       decoration: BoxDecoration(

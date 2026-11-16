@@ -1,54 +1,70 @@
-import 'package:math_expressions/math_expressions.dart';
-
 import '../math/exact_form.dart';
 import '../math/math_document.dart';
+import '../math/math_evaluator.dart';
+import '../math/real.dart';
 import '../utils/number_formatter.dart';
 
 /// Result of a calculator evaluation. Either holds a formatted display string
-/// or an error flag that the UI can render as "Error".
+/// or an error flag that the UI renders as a short message.
 class CalculationResult {
   const CalculationResult._({
     required this.display,
-    required this.value,
     required this.isError,
+    this.number,
     this.exact,
   });
 
+  /// The result as text, or the message for an error. A very large or very
+  /// small result is written `m×10^n`, which is expression source and can be
+  /// typeset or pasted back like any other.
   final String display;
-  final double? value;
   final bool isError;
+
+  /// The computed value. Null for an error or an empty result.
+  final Real? number;
 
   /// The result as a fraction, root or multiple of π, written as expression
   /// source (`frac(3,4)`), when it has such a form. Null for whole numbers
   /// and for values with no simple closed form.
   final String? exact;
 
+  /// The value as a double, infinite if it is out of a double's range.
+  double? get value => number?.toDouble();
+
   static const CalculationResult empty =
-      CalculationResult._(display: '', value: null, isError: false);
+      CalculationResult._(display: '', isError: false);
 
   static const CalculationResult error =
-      CalculationResult._(display: 'Error', value: null, isError: true);
+      CalculationResult._(display: 'Error', isError: true);
 
-  factory CalculationResult.success(
-    double value, {
-    int? decimals,
-    String? exact,
-  }) {
-    final text = decimals == null
-        ? NumberFormatter.formatResult(value)
-        : NumberFormatter.formatPrecise(value, decimals);
+  factory CalculationResult.success(Real number, {int? decimals}) {
     return CalculationResult._(
-      display: text,
-      value: value,
+      display: decimals == null
+          ? NumberFormatter.format(number)
+          : NumberFormatter.formatFixed(number, decimals),
       isError: false,
-      exact: exact,
+      number: number,
+      // The closed form needs every digit, so it is only looked for among
+      // ordinary values.
+      exact: number.isPlain ? ExactForm.of(number.toDouble()) : null,
+    );
+  }
+
+  factory CalculationResult.failure(MathErrorKind kind) {
+    return CalculationResult._(
+      display: switch (kind) {
+        MathErrorKind.divideByZero => "Can't divide by 0",
+        MathErrorKind.notReal => 'Not a real number',
+        MathErrorKind.tooLarge => 'Too large',
+        MathErrorKind.syntax => 'Error',
+      },
+      isError: true,
     );
   }
 }
 
-/// Pure expression evaluator. Translates the calculator's display syntax
-/// (`×`, `÷`, `√`, `^`, `%`, fractions, logarithms, …) into the parser's
-/// grammar before evaluating.
+/// Pure expression evaluator: parses the calculator's display syntax
+/// (`×`, `÷`, `√`, `^`, `%`, fractions, logarithms, …) and computes it.
 class CalculatorEngine {
   const CalculatorEngine();
 
@@ -62,65 +78,12 @@ class CalculatorEngine {
     if (!document.isComplete) return CalculationResult.empty;
 
     try {
-      final expression = _preprocess(document.toEngineSource());
-      final parser = ShuntingYardParser();
-      final exp = parser.parse(expression);
-      final evaluator = RealEvaluator();
-      final raw = evaluator.evaluate(exp).toDouble();
-      final result = _trimNoise(raw);
-      if (result.isNaN || result.isInfinite) return CalculationResult.error;
       return CalculationResult.success(
-        result,
+        MathEvaluator.evaluate(document),
         decimals: decimals,
-        // From the unrounded value: the closed form needs every digit.
-        exact: ExactForm.of(raw),
       );
-    } catch (_) {
-      return CalculationResult.error;
+    } on MathError catch (error) {
+      return CalculationResult.failure(error.kind);
     }
-  }
-
-  /// Rounds away binary floating-point residue, so that log₁₀1000 reads 3
-  /// rather than 2.9999999999999996 and 0.1+0.2 reads 0.3.
-  static double _trimNoise(double value) {
-    if (value.isNaN || value.isInfinite) return value;
-    return double.parse(value.toStringAsPrecision(12));
-  }
-
-  /// Translate display syntax → math_expressions grammar.
-  ///
-  /// `math_expressions` already accepts `^` as POW and `%` as MOD natively,
-  /// so we only rewrite tokens it doesn't understand (`×`, `÷`, `√`, `π`,
-  /// percentage semantics, and the `mod(` long-press shortcut).
-  String _preprocess(String input) {
-    var s = input;
-    s = s.replaceAll('×', '*');
-    s = s.replaceAll('÷', '/');
-    s = s.replaceAll('π', '(3.14159265358979)');
-    s = s.replaceAll('√', 'sqrt');
-
-    // The `%` button means percentage-of, NOT modulo (modulo is reachable
-    // through the long-press `mod(` shortcut, handled below). Rewrite first
-    // so the literal `%` is gone before the parser sees it.
-    //   Standalone X% → (X/100)
-    s = s.replaceAllMapped(
-      RegExp(r'(\d+(?:\.\d+)?)%(?!\d)'),
-      (m) => '(${m.group(1)}/100)',
-    );
-    //   X%Y (digit after) → (X/100)*Y, the calculator-style "percentage of"
-    s = s.replaceAllMapped(
-      RegExp(r'(\d+(?:\.\d+)?)%(\d+(?:\.\d+)?)'),
-      (m) => '(${m.group(1)}/100)*${m.group(2)}',
-    );
-
-    // Long-press `%` inserts `mod(`, so users finish a modulo as `Xmod(Y)`.
-    // Translate to the parser's native MOD operator. Done AFTER percentage
-    // rewrites so the inserted `%` survives to the parser as MOD.
-    s = s.replaceAllMapped(
-      RegExp(r'(\d+(?:\.\d+)?|\([^()]*\))mod\((\d+(?:\.\d+)?|\([^()]*\))\)'),
-      (m) => '(${m.group(1)}%${m.group(2)})',
-    );
-
-    return s;
   }
 }

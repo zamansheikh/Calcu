@@ -40,9 +40,77 @@ enum MathTemplate {
 /// see. These operations work on the parsed structure instead and always
 /// leave the caret on a valid stop.
 abstract final class ExpressionEditor {
+  static const _operators = '+-×÷';
+
   static EditState insert(String text, int cursor, String value) {
     if (value == ')') return _close(text, cursor, literalFallback: true);
+    if (value == '.') return _decimalPoint(text, cursor);
+    if (value.length == 1 && _operators.contains(value)) {
+      return _operator(text, cursor, value);
+    }
     return _spliced(text, cursor, cursor, value, cursor + value.length);
+  }
+
+  /// Types an operator the way a calculator does: a second operator replaces
+  /// the first instead of piling up into `5×÷3`, and an expression cannot
+  /// open with `×`. The one pair that means something is kept: a minus after
+  /// `×` or `÷` starts a negative operand.
+  static EditState _operator(String text, int cursor, String op) {
+    final doc = MathDocument.parse(text);
+    final rowStart = doc.ownerOf(doc.snap(cursor))?.start ?? 0;
+
+    var start = cursor;
+    while (start > rowStart && _operators.contains(text[start - 1])) {
+      start--;
+    }
+
+    if (start == cursor) {
+      // Nothing to replace. At the start of a row only a sign makes sense.
+      if (cursor == rowStart && op != '-') return EditState(text, cursor);
+      return _spliced(text, cursor, cursor, op, cursor + 1);
+    }
+
+    final previous = text.substring(start, cursor);
+    if (op == '-' && (previous == '×' || previous == '÷')) {
+      return _spliced(text, cursor, cursor, op, cursor + 1);
+    }
+    // The run to replace opens the row: it can only become a sign, or go.
+    if (start == rowStart && op != '-') {
+      return _spliced(text, start, cursor, '', start);
+    }
+    return _spliced(text, start, cursor, op, start + 1);
+  }
+
+  /// Types a decimal point: one per number, and `0.` when there is no digit
+  /// for it to follow.
+  static EditState _decimalPoint(String text, int cursor) {
+    bool isNumeric(int i) =>
+        i >= 0 && i < text.length && '0123456789.'.contains(text[i]);
+
+    var start = cursor, end = cursor;
+    while (isNumeric(start - 1)) {
+      start--;
+    }
+    while (isNumeric(end)) {
+      end++;
+    }
+    if (text.substring(start, end).contains('.')) {
+      return EditState(text, cursor);
+    }
+    final point = start == cursor ? '0.' : '.';
+    return _spliced(text, cursor, cursor, point, cursor + point.length);
+  }
+
+  /// [text] with every bracket still open at its end closed, so that `(2+3`
+  /// can be evaluated as written.
+  static String closeBrackets(String text) {
+    var row = MathDocument.parse(text).root;
+    var missing = 0;
+    while (row.children.isNotEmpty && !row.children.last.closed) {
+      missing++;
+      row = row.children.last.slots.last;
+    }
+    return text + ')' * missing;
   }
 
   static EditState insertTemplate(

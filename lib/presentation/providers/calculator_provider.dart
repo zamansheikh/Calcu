@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/math/expression_editor.dart';
+import '../../core/math/math_document.dart';
 import '../../core/services/calculator_engine.dart';
 import '../../core/utils/number_formatter.dart';
 import '../../data/models/saved_entry.dart';
@@ -59,11 +60,11 @@ class CalculatorProvider extends ChangeNotifier {
   /// The result in [resultFormat]. For [ResultFormat.fraction] this is
   /// expression source to typeset; otherwise it is plain text.
   String get output {
-    final value = _preview.value;
+    final number = _preview.number;
     return switch (_format) {
       ResultFormat.fraction => _preview.exact ?? _preview.display,
-      ResultFormat.precise when value != null =>
-        NumberFormatter.formatPrecise(value, _preciseDecimals),
+      ResultFormat.precise when number != null =>
+        NumberFormatter.formatFixed(number, _preciseDecimals),
       _ => _preview.display,
     };
   }
@@ -71,7 +72,7 @@ class CalculatorProvider extends ChangeNotifier {
   /// What pressing `=` again will switch the result to, or null while there
   /// is no finished result to reformat.
   ResultFormat? get nextResultFormat =>
-      _isCalculated && _preview.value != null ? _formatAfter(_format) : null;
+      _isCalculated && _preview.number != null ? _formatAfter(_format) : null;
 
   ResultFormat _formatAfter(ResultFormat format) => switch (format) {
         ResultFormat.decimal => _preview.exact != null
@@ -145,6 +146,7 @@ class CalculatorProvider extends ChangeNotifier {
     if (next != null) {
       _format = next;
     } else {
+      _closeOpenBrackets();
       _preview = _engine.evaluate(expression);
       _format = ResultFormat.decimal;
       _isCalculated = true;
@@ -156,6 +158,7 @@ class CalculatorProvider extends ChangeNotifier {
   /// Long-press `=`: go straight to 3 decimal places.
   void calculatePrecise() {
     if (expression.isEmpty) return;
+    _closeOpenBrackets();
     _preview = _engine.evaluate(expression);
     _format = ResultFormat.precise;
     _isCalculated = true;
@@ -200,11 +203,16 @@ class CalculatorProvider extends ChangeNotifier {
     return true;
   }
 
-  /// Paste a saved result at the caret.
+  /// Paste a saved result at the caret. Like a pasted expression, a result
+  /// that is more than a bare number (`1.2×10^40`, or anything negative) is
+  /// bracketed when it lands inside another expression.
   void useSavedValue(int index) {
     if (index < 0 || index >= _savedEntries.length) return;
+    final value = _savedEntries[index].value;
     _afterEdit();
-    _input.insertText(_savedEntries[index].value);
+    _input.insertText(
+      expression.isEmpty ? value : ExpressionEditor.asOperand(value),
+    );
     HapticFeedback.selectionClick();
   }
 
@@ -253,6 +261,15 @@ class CalculatorProvider extends ChangeNotifier {
   }
 
   // ------------------------------------------------------------- Internals
+  /// `=` on `(2+3` means `(2+3)`: supply the brackets left open, provided
+  /// that is all the expression was missing.
+  void _closeOpenBrackets() {
+    final closed = ExpressionEditor.closeBrackets(expression);
+    if (closed == expression) return;
+    if (!MathDocument.parse(closed).isComplete) return;
+    _input.setText(closed);
+  }
+
   void _afterEdit() {
     if (_isCalculated) {
       _isCalculated = false;

@@ -397,14 +397,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.0"
-  math_expressions:
-    dependency: "direct main"
-    description:
-      name: math_expressions
-      sha256: "22aca3a24e445be5f42ecf186cbded1f9951bf9ec5eb48fcddbd55e102bb11f5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.0"
   meta:
     dependency: transitive
     description:
