@@ -51,10 +51,27 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
         height: 1.1,
       );
 
+  /// The style the expression is actually painted with.
+  ///
+  /// The ambient [DefaultTextStyle] contributes layout-affecting properties
+  /// (Material 3 body text carries letter spacing), so the caret has to be
+  /// measured with it too — measuring the bare [_expressionStyle] makes the
+  /// caret drift further left with every character.
+  TextStyle _resolvedStyle() {
+    var style = DefaultTextStyle.of(context).style.merge(_expressionStyle);
+    if (MediaQuery.boldTextOf(context)) {
+      style = style.merge(const TextStyle(fontWeight: FontWeight.bold));
+    }
+    return style;
+  }
+
+  /// Lays out [text] exactly as the on-screen [RichText] does: same resolved
+  /// style, same text scaler. Caret and tap positions come from here.
   TextPainter _layoutPainter(String text) {
     return TextPainter(
-      text: TextSpan(text: text, style: _expressionStyle),
+      text: TextSpan(text: text, style: _resolvedStyle()),
       textDirection: TextDirection.ltr,
+      textScaler: MediaQuery.textScalerOf(context),
     )..layout();
   }
 
@@ -96,6 +113,7 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
     final formatted = NumberFormatter.addThousandsSeparators(input);
     final painter = _layoutPainter(formatted);
     final pos = painter.getPositionForOffset(local);
+    painter.dispose();
     final rawIndex = _formattedToRaw(formatted, pos.offset);
 
     provider.moveCursor(rawIndex);
@@ -113,10 +131,10 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
             ? NumberFormatter.addThousandsSeparators(input)
             : '0';
 
-        double cursorX = 0;
-        double textHeight = 0;
+        final painter = _layoutPainter(displayText);
+        final textHeight = painter.size.height;
+        final double cursorX;
         if (hasInput) {
-          final painter = _layoutPainter(displayText);
           final formattedCursor =
               _rawToFormatted(displayText, calc.input.cursor);
           cursorX = painter
@@ -125,12 +143,17 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
                 Rect.zero,
               )
               .dx;
-          textHeight = painter.size.height;
         } else {
-          final painter = _layoutPainter(displayText);
           cursorX = painter.size.width + 2.r;
-          textHeight = painter.size.height;
         }
+        painter.dispose();
+
+        // The caret is centred on the gap between two characters, so at either
+        // end of the text half of it hangs outside the text box. The gutter
+        // keeps that half inside the scroll view, which would otherwise clip
+        // it once the expression is long enough to scroll.
+        final caretWidth = 2.5.r;
+        final gutter = caretWidth;
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -138,7 +161,12 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
           onLongPress: () => calc.saveExpressionResult(),
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.fromLTRB(18.r, 14.r, 18.r, 14.r),
+            padding: EdgeInsets.fromLTRB(
+              18.r - gutter,
+              14.r,
+              18.r - gutter,
+              14.r,
+            ),
             decoration: BoxDecoration(
               color: palette.displayBackground,
               borderRadius: BorderRadius.circular(20.r),
@@ -163,23 +191,34 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      Text(
-                        displayText,
-                        key: _textKey,
-                        style: _expressionStyle.copyWith(
-                          color: hasInput
-                              ? palette.expressionText
-                              : palette.placeholderText,
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: gutter),
+                        // RichText paints exactly this span — unlike Text, it
+                        // adds nothing from the ambient theme — so it matches
+                        // what `_layoutPainter` measures.
+                        child: RichText(
+                          key: _textKey,
+                          textScaler: MediaQuery.textScalerOf(context),
+                          text: TextSpan(
+                            text: displayText,
+                            style: _resolvedStyle().copyWith(
+                              color: hasInput
+                                  ? palette.expressionText
+                                  : palette.placeholderText,
+                            ),
+                          ),
                         ),
                       ),
                       if (_focused)
                         Positioned(
-                          left: cursorX - 1.25.r,
+                          left: gutter + cursorX - caretWidth / 2,
                           top: 0,
                           bottom: 0,
                           child: _Cursor(
                             controller: _cursorController,
                             color: palette.cursor,
+                            width: caretWidth,
+                            height: textHeight * 0.8,
                           ),
                         ),
                     ],
@@ -195,9 +234,16 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
 }
 
 class _Cursor extends StatelessWidget {
-  const _Cursor({required this.controller, required this.color});
+  const _Cursor({
+    required this.controller,
+    required this.color,
+    required this.width,
+    required this.height,
+  });
   final Animation<double> controller;
   final Color color;
+  final double width;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -206,8 +252,8 @@ class _Cursor extends StatelessWidget {
         child: FadeTransition(
           opacity: controller,
           child: Container(
-            width: 2.5.r,
-            height: 40.sp,
+            width: width,
+            height: height,
             decoration: BoxDecoration(
               color: color,
               borderRadius: BorderRadius.circular(1.5.r),
