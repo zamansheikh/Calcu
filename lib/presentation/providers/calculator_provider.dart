@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/math/expression_editor.dart';
 import '../../core/services/calculator_engine.dart';
 import '../../data/repositories/saved_values_repository.dart';
 import '../controllers/input_controller.dart';
@@ -55,9 +56,26 @@ class CalculatorProvider extends ChangeNotifier {
     HapticFeedback.selectionClick();
   }
 
+  /// Insert a fraction, root, logarithm… with the caret in its first slot.
+  void insertTemplate(MathTemplate template) {
+    _afterEdit();
+    _input.insertTemplate(template);
+    HapticFeedback.selectionClick();
+  }
+
   void backspace() {
     final removed = _input.deleteCharacter();
     if (removed) HapticFeedback.lightImpact();
+  }
+
+  void moveCursorLeft() {
+    _input.moveLeft();
+    HapticFeedback.selectionClick();
+  }
+
+  void moveCursorRight() {
+    _input.moveRight();
+    HapticFeedback.selectionClick();
   }
 
   void clearAll() {

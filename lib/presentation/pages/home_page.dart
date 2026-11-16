@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage>
                         const SavedValuesStrip(),
                         SizedBox(height: 8.r),
                         Expanded(
-                          flex: 14,
+                          flex: 15,
                           child: Padding(
                             padding: EdgeInsets.only(top: 4.r),
                             child: const ButtonGrid(),

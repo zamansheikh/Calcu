@@ -19,8 +19,11 @@ class CalculatorButton extends StatelessWidget {
     this.style = CalculatorButtonStyle.number,
     this.flex = 1,
     this.subLabel,
+    this.compact = false,
   });
 
+  /// Smaller type and tighter corners, for the function row above the keypad.
+  final bool compact;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
   final String? label;
@@ -56,14 +59,14 @@ class CalculatorButton extends StatelessWidget {
     return Expanded(
       flex: flex,
       child: Padding(
-        padding: EdgeInsets.all(5.r),
+        padding: EdgeInsets.all(compact ? 4.r : 5.r),
         child: AnimatedTap(
           onTap: onTap,
           onLongPress: onLongPress,
           child: Container(
             decoration: BoxDecoration(
               color: colors.background,
-              borderRadius: BorderRadius.circular(22.r),
+              borderRadius: BorderRadius.circular(compact ? 16.r : 22.r),
               boxShadow: [
                 BoxShadow(
                   color: isEmphasis
@@ -76,7 +79,11 @@ class CalculatorButton extends StatelessWidget {
             ),
             child: Center(
               child: icon != null
-                  ? Icon(icon, size: 26.sp, color: colors.foreground)
+                  ? Icon(
+                      icon,
+                      size: compact ? 24.sp : 26.sp,
+                      color: colors.foreground,
+                    )
                   : Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -93,13 +100,13 @@ class CalculatorButton extends StatelessWidget {
                         ),
                         if (subLabel != null)
                           Padding(
-                            padding: EdgeInsets.only(top: 2.r),
+                            padding: EdgeInsets.only(top: compact ? 1.r : 2.r),
                             child: Text(
                               subLabel!,
                               style: TextStyle(
                                 color: colors.foreground.withValues(alpha: 0.6),
                                 fontFamily: 'Urbanist',
-                                fontSize: 10.sp,
+                                fontSize: compact ? 9.sp : 10.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -114,6 +121,7 @@ class CalculatorButton extends StatelessWidget {
   }
 
   double _fontSize() {
+    if (compact) return 18.sp;
     switch (style) {
       case CalculatorButtonStyle.equals:
         return 30.sp;

@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/math/math_document.dart';
 import '../../core/utils/number_formatter.dart';
 import '../../theme/calcu_palette.dart';
 import '../providers/calculator_provider.dart';
+import 'math/math_layout.dart';
 
-/// Top half of the display: scrollable, tap-to-position expression with an
-/// animated cursor. Long-press saves the evaluated result.
+/// Top half of the display: the expression, typeset the way it would be
+/// written by hand — exponents raised, fractions stacked, roots under a bar —
+/// with a caret that can be placed by tapping. Long-press saves the result.
 ///
-/// The text is rendered as a single `Text` widget inside a horizontal scroll
-/// view; the cursor is overlaid via `Positioned`. Hit-testing maps the global
-/// tap to the text widget's local coords (so it survives any scroll offset)
-/// and we translate between the formatted display string and the raw input
-/// by counting the commas inserted as thousands separators.
+/// The expression is laid out once per build into a [MathLayout], and that
+/// one layout paints it, positions the caret and resolves taps.
 class ExpressionDisplay extends StatefulWidget {
   const ExpressionDisplay({super.key});
 
@@ -23,10 +23,19 @@ class ExpressionDisplay extends StatefulWidget {
 
 class _ExpressionDisplayState extends State<ExpressionDisplay>
     with SingleTickerProviderStateMixin {
-  final GlobalKey _textKey = GlobalKey();
+  /// A tall expression is shrunk to fit the display, but not below this.
+  static const _minFitScale = 0.45;
+
+  final GlobalKey _paintKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   late final AnimationController _cursorController;
+
+  MathLayout? _layout;
   bool _focused = false;
+
+  // The edit the scroll position was last adjusted for.
+  String? _revealedText;
+  int? _revealedCursor;
 
   @override
   void initState() {
@@ -34,6 +43,7 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
     _cursorController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
+      value: 1,
     )..repeat(reverse: true);
   }
 
@@ -41,83 +51,71 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
   void dispose() {
     _cursorController.dispose();
     _scrollController.dispose();
+    _layout?.dispose();
     super.dispose();
   }
 
-  TextStyle get _expressionStyle => TextStyle(
-        fontFamily: 'Urbanist',
-        fontSize: 46.sp,
-        fontWeight: FontWeight.w600,
-        height: 1.1,
+  MathLayout _buildLayout(
+    MathDocument document,
+    MathStyle style,
+    double maxHeight,
+  ) {
+    var layout = MathLayout(document, style);
+    if (maxHeight.isFinite && layout.size.height > maxHeight) {
+      final scale =
+          (maxHeight / layout.size.height).clamp(_minFitScale, 1.0);
+      layout.dispose();
+      layout = MathLayout(
+        document,
+        style.copyWith(fontSize: style.fontSize * scale),
       );
-
-  /// The style the expression is actually painted with.
-  ///
-  /// The ambient [DefaultTextStyle] contributes layout-affecting properties
-  /// (Material 3 body text carries letter spacing), so the caret has to be
-  /// measured with it too — measuring the bare [_expressionStyle] makes the
-  /// caret drift further left with every character.
-  TextStyle _resolvedStyle() {
-    var style = DefaultTextStyle.of(context).style.merge(_expressionStyle);
-    if (MediaQuery.boldTextOf(context)) {
-      style = style.merge(const TextStyle(fontWeight: FontWeight.bold));
     }
-    return style;
+    return layout;
   }
 
-  /// Lays out [text] exactly as the on-screen [RichText] does: same resolved
-  /// style, same text scaler. Caret and tap positions come from here.
-  TextPainter _layoutPainter(String text) {
-    return TextPainter(
-      text: TextSpan(text: text, style: _resolvedStyle()),
-      textDirection: TextDirection.ltr,
-      textScaler: MediaQuery.textScalerOf(context),
-    )..layout();
-  }
-
-  /// Map a position in the *formatted* string (with commas) back to the
-  /// corresponding index in the *raw* input.
-  int _formattedToRaw(String formatted, int formattedIndex) {
-    final clamped = formattedIndex.clamp(0, formatted.length);
-    var commas = 0;
-    for (var i = 0; i < clamped; i++) {
-      if (formatted[i] == ',') commas++;
-    }
-    return clamped - commas;
-  }
-
-  /// Map a raw cursor index to the corresponding index in the formatted
-  /// string (used to draw the cursor at the right pixel position).
-  int _rawToFormatted(String formatted, int rawIndex) {
-    var rawCount = 0;
-    for (var i = 0; i < formatted.length; i++) {
-      if (rawCount == rawIndex) return i;
-      if (formatted[i] != ',') rawCount++;
-    }
-    return formatted.length;
-  }
-
-  void _handleTap(TapUpDetails details, String input) {
+  void _handleTap(TapUpDetails details) {
     final provider = context.read<CalculatorProvider>();
-
-    if (input.isEmpty) {
-      provider.moveCursor(0);
-      setState(() => _focused = true);
-      return;
+    final layout = _layout;
+    final box = _paintKey.currentContext?.findRenderObject() as RenderBox?;
+    if (provider.expression.isNotEmpty && layout != null && box != null) {
+      final local = box.globalToLocal(details.globalPosition);
+      provider.moveCursor(layout.stopAt(local));
     }
-
-    final box = _textKey.currentContext?.findRenderObject() as RenderBox?;
-    if (box == null) return;
-
-    final local = box.globalToLocal(details.globalPosition);
-    final formatted = NumberFormatter.addThousandsSeparators(input);
-    final painter = _layoutPainter(formatted);
-    final pos = painter.getPositionForOffset(local);
-    painter.dispose();
-    final rawIndex = _formattedToRaw(formatted, pos.offset);
-
-    provider.moveCursor(rawIndex);
     setState(() => _focused = true);
+  }
+
+  /// Scrolls so the caret is on screen after an edit or a caret move. Left
+  /// alone otherwise, so the user can still pan a long expression by hand.
+  void _revealCaret(String text, int cursor, double caretX, double width) {
+    if (text == _revealedText && cursor == _revealedCursor) return;
+    _revealedText = text;
+    _revealedCursor = cursor;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // Restart the blink so the caret is solid the moment it moves.
+      _cursorController
+        ..value = 1
+        ..repeat(reverse: true);
+      if (!_scrollController.hasClients) return;
+      final position = _scrollController.position;
+      final viewport = position.viewportDimension;
+      final margin = 28.r;
+      // The view is reversed: `pixels` counts in from the right-hand end.
+      final visibleRight = width - position.pixels;
+      final visibleLeft = visibleRight - viewport;
+
+      double? target;
+      if (caretX > visibleRight - margin) {
+        target = width - caretX - margin;
+      } else if (caretX < visibleLeft + margin) {
+        target = width - viewport - caretX + margin;
+      }
+      if (target == null) return;
+      position.jumpTo(
+        target.clamp(position.minScrollExtent, position.maxScrollExtent),
+      );
+    });
   }
 
   @override
@@ -127,29 +125,10 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
       builder: (context, calc, _) {
         final input = calc.expression;
         final hasInput = input.isNotEmpty;
-        final displayText = hasInput
-            ? NumberFormatter.addThousandsSeparators(input)
-            : '0';
+        final cursor = calc.input.cursor;
 
-        final painter = _layoutPainter(displayText);
-        final textHeight = painter.size.height;
-        final double cursorX;
-        if (hasInput) {
-          final formattedCursor =
-              _rawToFormatted(displayText, calc.input.cursor);
-          cursorX = painter
-              .getOffsetForCaret(
-                TextPosition(offset: formattedCursor),
-                Rect.zero,
-              )
-              .dx;
-        } else {
-          cursorX = painter.size.width + 2.r;
-        }
-        painter.dispose();
-
-        // The caret is centred on the gap between two characters, so at either
-        // end of the text half of it hangs outside the text box. The gutter
+        // The caret is centred on the gap between two characters, so at
+        // either end of the expression half of it hangs outside. The gutter
         // keeps that half inside the scroll view, which would otherwise clip
         // it once the expression is long enough to scroll.
         final caretWidth = 2.5.r;
@@ -157,7 +136,7 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTapUp: (details) => _handleTap(details, input),
+          onTapUp: _handleTap,
           onLongPress: () => calc.saveExpressionResult(),
           child: Container(
             width: double.infinity,
@@ -179,58 +158,118 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
                 ),
               ],
             ),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                scrollDirection: Axis.horizontal,
-                reverse: true,
-                physics: const BouncingScrollPhysics(),
-                child: SizedBox(
-                  height: textHeight,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: gutter),
-                        // RichText paints exactly this span — unlike Text, it
-                        // adds nothing from the ambient theme — so it matches
-                        // what `_layoutPainter` measures.
-                        child: RichText(
-                          key: _textKey,
-                          textScaler: MediaQuery.textScalerOf(context),
-                          text: TextSpan(
-                            text: displayText,
-                            style: _resolvedStyle().copyWith(
-                              color: hasInput
-                                  ? palette.expressionText
-                                  : palette.placeholderText,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final style = MathStyle(
+                  fontSize: MediaQuery.textScalerOf(context).scale(46.sp),
+                  fontWeight: MediaQuery.boldTextOf(context)
+                      ? FontWeight.w700
+                      : FontWeight.w600,
+                  color: hasInput
+                      ? palette.expressionText
+                      : palette.placeholderText,
+                  placeholderColor:
+                      palette.expressionText.withValues(alpha: 0.35),
+                );
+
+                _layout?.dispose();
+                final layout = _layout = _buildLayout(
+                  hasInput ? calc.input.document : MathDocument.parse('0'),
+                  style,
+                  constraints.maxHeight,
+                );
+
+                final CaretMetrics caret;
+                if (hasInput) {
+                  caret = layout.caretAt(cursor);
+                } else {
+                  // Nothing typed yet: the caret waits after the grey 0.
+                  final end = layout.caretAt(1);
+                  caret = CaretMetrics(
+                    x: end.x + 2.r,
+                    top: end.top,
+                    bottom: end.bottom,
+                  );
+                }
+
+                final width = layout.size.width + 2 * gutter;
+                _revealCaret(input, cursor, gutter + caret.x, width);
+
+                // While typing straight along the main line the caret stays
+                // out of the way until the display is tapped. Inside an
+                // exponent or a fraction it is the only thing that shows
+                // where the next key will land, so it is always drawn.
+                final document = calc.input.document;
+                final atPlainEnd = cursor == input.length &&
+                    identical(document.ownerOf(cursor), document.root);
+                final showCaret = _focused || (hasInput && !atPlainEnd);
+
+                return Align(
+                  alignment: Alignment.centerRight,
+                  child: ClipRect(
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      reverse: true,
+                      physics: const BouncingScrollPhysics(),
+                      child: SizedBox(
+                        width: width,
+                        height: layout.size.height,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Positioned(
+                              left: gutter,
+                              top: 0,
+                              child: Semantics(
+                                label: hasInput
+                                    ? NumberFormatter.addThousandsSeparators(
+                                        input)
+                                    : '0',
+                                child: CustomPaint(
+                                  key: _paintKey,
+                                  size: layout.size,
+                                  painter: _MathPainter(layout),
+                                ),
+                              ),
                             ),
-                          ),
+                            if (showCaret)
+                              Positioned(
+                                left: gutter + caret.x - caretWidth / 2,
+                                top: caret.top,
+                                child: _Cursor(
+                                  controller: _cursorController,
+                                  color: palette.cursor,
+                                  width: caretWidth,
+                                  height: caret.height,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
-                      if (_focused)
-                        Positioned(
-                          left: gutter + cursorX - caretWidth / 2,
-                          top: 0,
-                          bottom: 0,
-                          child: _Cursor(
-                            controller: _cursorController,
-                            color: palette.cursor,
-                            width: caretWidth,
-                            height: textHeight * 0.8,
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ),
         );
       },
     );
   }
+}
+
+class _MathPainter extends CustomPainter {
+  const _MathPainter(this.layout);
+
+  final MathLayout layout;
+
+  @override
+  void paint(Canvas canvas, Size size) => layout.paint(canvas, Offset.zero);
+
+  @override
+  bool shouldRepaint(_MathPainter oldDelegate) =>
+      !identical(oldDelegate.layout, layout);
 }
 
 class _Cursor extends StatelessWidget {
@@ -240,6 +279,7 @@ class _Cursor extends StatelessWidget {
     required this.width,
     required this.height,
   });
+
   final Animation<double> controller;
   final Color color;
   final double width;
@@ -248,16 +288,14 @@ class _Cursor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      child: Center(
-        child: FadeTransition(
-          opacity: controller,
-          child: Container(
-            width: width,
-            height: height,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(1.5.r),
-            ),
+      child: FadeTransition(
+        opacity: controller,
+        child: Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(width / 2),
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:math_expressions/math_expressions.dart';
 
+import '../math/math_document.dart';
 import '../utils/number_formatter.dart';
 
 /// Result of a calculator evaluation. Either holds a formatted display string
@@ -30,25 +31,26 @@ class CalculationResult {
 }
 
 /// Pure expression evaluator. Translates the calculator's display syntax
-/// (`×`, `÷`, `√`, `^`, `%`) into the parser's grammar before evaluating.
+/// (`×`, `÷`, `√`, `^`, `%`, fractions, logarithms, …) into the parser's
+/// grammar before evaluating.
 class CalculatorEngine {
   const CalculatorEngine();
-
-  static const _operators = ['+', '-', '×', '÷', '*', '/', '^'];
 
   /// Evaluates a complete expression. If `decimals` is provided, the result
   /// is formatted to that many decimal places (used for the long-press `=`
   /// precise mode).
   CalculationResult evaluate(String input, {int? decimals}) {
     if (input.isEmpty) return CalculationResult.empty;
-    if (!_isComplete(input)) return CalculationResult.empty;
+    // Half-typed input (`2+`, `(3+4`, an empty denominator) gets no preview.
+    final document = MathDocument.parse(input);
+    if (!document.isComplete) return CalculationResult.empty;
 
     try {
-      final expression = _preprocess(input);
+      final expression = _preprocess(document.toEngineSource());
       final parser = ShuntingYardParser();
       final exp = parser.parse(expression);
       final evaluator = RealEvaluator();
-      final result = evaluator.evaluate(exp).toDouble();
+      final result = _trimNoise(evaluator.evaluate(exp).toDouble());
       if (result.isNaN || result.isInfinite) return CalculationResult.error;
       return CalculationResult.success(result, decimals: decimals);
     } catch (_) {
@@ -56,21 +58,11 @@ class CalculatorEngine {
     }
   }
 
-  /// Heuristic for "should we show a live preview?". Avoids triggering on
-  /// half-typed expressions like `2+` or `(3+4`.
-  bool _isComplete(String input) {
-    final last = input[input.length - 1];
-    if (_operators.contains(last)) return false;
-    if (last == '.') return false;
-    if (last == '(') return false;
-
-    int depth = 0;
-    for (final ch in input.split('')) {
-      if (ch == '(') depth++;
-      if (ch == ')') depth--;
-      if (depth < 0) return false;
-    }
-    return depth == 0;
+  /// Rounds away binary floating-point residue, so that log₁₀1000 reads 3
+  /// rather than 2.9999999999999996 and 0.1+0.2 reads 0.3.
+  static double _trimNoise(double value) {
+    if (value.isNaN || value.isInfinite) return value;
+    return double.parse(value.toStringAsPrecision(12));
   }
 
   /// Translate display syntax → math_expressions grammar.

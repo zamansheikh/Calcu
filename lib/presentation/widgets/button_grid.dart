@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/math/expression_editor.dart';
 import '../providers/calculator_provider.dart';
 import 'calculator_button.dart';
 
-/// 6×4 calculator keypad. Each row stretches to fill its share of the
-/// available vertical space; each button stretches across its row.
+/// Calculator keypad: a slim row of function keys above the 6×4 grid. Each
+/// row stretches to fill its share of the available vertical space; each
+/// button stretches across its row.
 class ButtonGrid extends StatelessWidget {
   const ButtonGrid({super.key});
 
-  Widget _row(List<Widget> children) {
+  Widget _row(List<Widget> children, {int flex = 10}) {
     return Expanded(
+      flex: flex,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: children,
@@ -23,6 +26,49 @@ class ButtonGrid extends StatelessWidget {
     final calc = context.read<CalculatorProvider>();
     return Column(
       children: [
+        // Function row: ◀ ▶ a/b |x| log π
+        _row(flex: 7, [
+          CalculatorButton(
+            icon: Icons.chevron_left_rounded,
+            style: CalculatorButtonStyle.special,
+            compact: true,
+            onTap: calc.moveCursorLeft,
+          ),
+          CalculatorButton(
+            icon: Icons.chevron_right_rounded,
+            style: CalculatorButtonStyle.special,
+            compact: true,
+            onTap: calc.moveCursorRight,
+          ),
+          CalculatorButton(
+            label: 'a/b',
+            style: CalculatorButtonStyle.special,
+            compact: true,
+            onTap: () => calc.insertTemplate(MathTemplate.fraction),
+          ),
+          CalculatorButton(
+            label: '|x|',
+            style: CalculatorButtonStyle.special,
+            compact: true,
+            onTap: () => calc.insertTemplate(MathTemplate.absolute),
+          ),
+          CalculatorButton(
+            label: 'log',
+            subLabel: 'ln',
+            style: CalculatorButtonStyle.special,
+            compact: true,
+            onTap: () => calc.insertTemplate(MathTemplate.logarithm),
+            onLongPress: () => calc.insertTemplate(MathTemplate.naturalLog),
+          ),
+          CalculatorButton(
+            label: 'π',
+            subLabel: 'e',
+            style: CalculatorButtonStyle.special,
+            compact: true,
+            onTap: () => calc.insertSymbol('π'),
+            onLongPress: () => calc.insertSymbol('e'),
+          ),
+        ]),
         // Row 1: AC ( ) ⌫
         _row([
           CalculatorButton(
@@ -56,14 +102,14 @@ class ButtonGrid extends StatelessWidget {
           CalculatorButton(
             label: '√',
             style: CalculatorButtonStyle.special,
-            onTap: () => calc.insertSymbol('√('),
+            onTap: () => calc.insertTemplate(MathTemplate.squareRoot),
           ),
           CalculatorButton(
             label: '%',
             subLabel: 'mod',
             style: CalculatorButtonStyle.special,
             onTap: () => calc.insertSymbol('%'),
-            onLongPress: () => calc.insertSymbol('mod('),
+            onLongPress: () => calc.insertTemplate(MathTemplate.modulo),
           ),
           CalculatorButton(
             label: '÷',

@@ -1,67 +1,65 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
-/// Owns the calculator's expression text and cursor position.
+import '../../core/math/expression_editor.dart';
+import '../../core/math/math_document.dart';
+
+/// Owns the calculator's expression text and caret position.
 ///
-/// Wraps a `TextEditingController` so the cursor work integrates naturally
-/// with Flutter's text APIs while keeping the controller decoupled from the
-/// providers that consume it.
+/// Edits go through [ExpressionEditor], so the caret only ever rests on
+/// positions the display can show and structures such as fractions are
+/// inserted and removed whole.
 class InputController extends ChangeNotifier {
-  final TextEditingController _textController = TextEditingController();
+  String _text = '';
   int _cursor = 0;
+  MathDocument? _document;
 
-  String get input => _textController.text;
+  String get input => _text;
   int get cursor => _cursor;
-  TextEditingController get textController => _textController;
 
-  /// Insert at current cursor; cursor advances past the inserted text.
+  /// The parsed form of [input], shared by everything that draws it.
+  MathDocument get document => _document ??= MathDocument.parse(_text);
+
+  /// Insert at the caret; the caret advances past the inserted text.
   void insertText(String text) {
     if (text.isEmpty) return;
-    final current = _textController.text;
-    final newText =
-        current.substring(0, _cursor) + text + current.substring(_cursor);
-    _textController.text = newText;
-    _setCursor(_cursor + text.length);
+    _apply(ExpressionEditor.insert(_text, _cursor, text));
   }
 
-  /// Backspace: delete the character immediately before the cursor.
+  /// Insert a structure and leave the caret in its first empty slot.
+  void insertTemplate(MathTemplate template) {
+    _apply(ExpressionEditor.insertTemplate(_text, _cursor, template));
+  }
+
+  /// Backspace. Returns false if there was nothing to do.
   bool deleteCharacter() {
-    if (_cursor <= 0 || input.isEmpty) return false;
-    final newText =
-        input.substring(0, _cursor - 1) + input.substring(_cursor);
-    _textController.text = newText;
-    _setCursor(_cursor - 1);
-    return true;
+    return _apply(ExpressionEditor.backspace(_text, _cursor));
   }
 
-  /// Replace the entire input. Cursor moves to the end.
+  /// Replace the entire input. The caret moves to the end.
   void setText(String text) {
-    _textController.text = text;
-    _setCursor(text.length);
+    _apply(EditState(text, ExpressionEditor.snap(text, text.length)));
   }
 
-  /// Reset to empty. Cursor returns to position 0.
+  /// Reset to empty. The caret returns to position 0.
   void clear() {
-    _textController.clear();
-    _setCursor(0);
+    _apply(const EditState('', 0));
   }
 
-  /// Move the cursor; values outside `[0, input.length]` are clamped.
+  /// Move the caret to the valid position nearest [position].
   void moveCursorTo(int position) {
-    final clamped = position.clamp(0, input.length);
-    if (clamped == _cursor) return;
-    _setCursor(clamped);
+    _apply(EditState(_text, ExpressionEditor.snap(_text, position)));
   }
 
-  void _setCursor(int position) {
-    _cursor = position;
-    _textController.selection =
-        TextSelection.fromPosition(TextPosition(offset: position));
+  void moveLeft() => _apply(ExpressionEditor.moveLeft(_text, _cursor));
+
+  void moveRight() => _apply(ExpressionEditor.moveRight(_text, _cursor));
+
+  bool _apply(EditState next) {
+    if (next.text == _text && next.cursor == _cursor) return false;
+    if (next.text != _text) _document = null;
+    _text = next.text;
+    _cursor = next.cursor;
     notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    super.dispose();
+    return true;
   }
 }
