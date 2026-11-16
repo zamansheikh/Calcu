@@ -110,7 +110,7 @@ class AppTopBar extends StatelessWidget {
 
   void _confirmClearSaved(BuildContext context) {
     final calc = context.read<CalculatorProvider>();
-    if (calc.savedValues.isEmpty) return;
+    if (calc.savedEntries.isEmpty) return;
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(

@@ -1,8 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:calcu/core/math/exact_form.dart';
+import 'package:calcu/core/math/expression_editor.dart';
 import 'package:calcu/core/services/calculator_engine.dart';
 import 'package:calcu/core/services/storage_service.dart';
+import 'package:calcu/data/models/saved_entry.dart';
 import 'package:calcu/data/repositories/saved_values_repository.dart';
 import 'package:calcu/presentation/providers/calculator_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -56,6 +58,18 @@ void main() {
         if (ExactForm.of(random.nextDouble() * 100) != null) invented++;
       }
       expect(invented, 0);
+    });
+  });
+
+  group('asOperand', () {
+    test('brackets only what needs them', () {
+      expect(ExpressionEditor.asOperand('42'), '42');
+      expect(ExpressionEditor.asOperand('frac(1,2)'), 'frac(1,2)');
+      expect(ExpressionEditor.asOperand('√(9)'), '√(9)');
+      expect(ExpressionEditor.asOperand('(1+2)'), '(1+2)');
+      expect(ExpressionEditor.asOperand('1+2'), '(1+2)');
+      expect(ExpressionEditor.asOperand('-5'), '(-5)');
+      expect(ExpressionEditor.asOperand('2^3'), '(2^3)');
     });
   });
 
@@ -146,6 +160,113 @@ void main() {
       expect(calc.resultFormat, ResultFormat.fraction);
     });
 
+    test('a saved result remembers its expression', () async {
+      final calc = await provider();
+      calc
+        ..insertNumber('1')
+        ..insertOperator('+')
+        ..insertNumber('2');
+      expect(calc.saveCurrentResult(), isTrue);
+      expect(
+        calc.savedEntries.single,
+        const SavedEntry(value: '3', expression: '1+2'),
+      );
+    });
+
+    test('pasting the expression into an empty display restores it', () async {
+      final calc = await provider();
+      calc
+        ..insertNumber('1')
+        ..insertOperator('+')
+        ..insertNumber('2')
+        ..saveCurrentResult()
+        ..clearAll()
+        ..useSavedExpression(0);
+      expect(calc.expression, '1+2');
+    });
+
+    test('pasting it into another expression keeps its meaning', () async {
+      final calc = await provider();
+      calc
+        ..insertNumber('1')
+        ..insertOperator('+')
+        ..insertNumber('2')
+        ..saveCurrentResult()
+        ..clearAll()
+        ..insertNumber('3')
+        ..insertOperator('×')
+        ..useSavedExpression(0);
+      expect(calc.expression, '3×(1+2)');
+      expect(calc.output, '9');
+
+      // The result half pastes the number, as before.
+      calc
+        ..clearAll()
+        ..insertNumber('3')
+        ..insertOperator('×')
+        ..useSavedValue(0);
+      expect(calc.expression, '3×3');
+    });
+
+    test('saved entries survive a restart, with their expressions', () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = await StorageService.create();
+      final repository = SavedValuesRepository(storage);
+      final first = CalculatorProvider(
+        engine: const CalculatorEngine(),
+        savedValuesRepository: repository,
+      );
+      first
+        ..insertTemplate(MathTemplate.fraction)
+        ..insertNumber('1')
+        ..insertSymbol(')')
+        ..insertNumber('4')
+        ..saveCurrentResult();
+
+      final second = CalculatorProvider(
+        engine: const CalculatorEngine(),
+        savedValuesRepository: repository,
+      );
+      expect(
+        second.savedEntries.single,
+        const SavedEntry(value: '0.25', expression: 'frac(1,4)'),
+      );
+    });
+
+    test('values saved by an earlier version are carried over', () async {
+      SharedPreferences.setMockInitialValues({
+        'flutter.calculator.saved_values': <String>['16.6722414061', '42'],
+      });
+      final storage = await StorageService.create();
+      final calc = CalculatorProvider(
+        engine: const CalculatorEngine(),
+        savedValuesRepository: SavedValuesRepository(storage),
+      );
+      expect(calc.savedEntries, const [
+        SavedEntry(value: '16.6722414061'),
+        SavedEntry(value: '42'),
+      ]);
+      // With no expression to paste, that half falls back to the value.
+      calc.useSavedExpression(1);
+      expect(calc.expression, '42');
+    });
+
+    test('a removed entry can be put back where it was', () async {
+      final calc = await provider();
+      for (final digit in ['1', '2', '3']) {
+        calc
+          ..clearAll()
+          ..insertNumber(digit)
+          ..saveCurrentResult();
+      }
+      final removed = calc.deleteSavedValue(1);
+      expect(removed, const SavedEntry(value: '2', expression: '2'));
+      expect([for (final e in calc.savedEntries) e.value], ['1', '3']);
+
+      calc.restoreSavedEntry(1, removed!);
+      expect([for (final e in calc.savedEntries) e.value], ['1', '2', '3']);
+    });
+
     test('a saved fraction is stored as its decimal', () async {
       final calc = await provider();
       calc
@@ -155,7 +276,8 @@ void main() {
         ..calculate()
         ..calculate();
       expect(calc.saveCurrentResult(), isTrue);
-      expect(calc.savedValues.last, '0.75');
+      expect(calc.savedEntries.last.value, '0.75');
+      expect(calc.savedEntries.last.expression, '3÷4');
     });
   });
 }

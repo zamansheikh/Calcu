@@ -122,6 +122,24 @@ abstract final class ExpressionEditor {
     return _close(text, cursor, literalFallback: false);
   }
 
+  /// [source] in a form that can be dropped into the middle of another
+  /// expression without changing what it means: `1+2` becomes `(1+2)`, so
+  /// that pasting it after `3×` still multiplies the whole of it. A lone
+  /// number or a single closed structure needs no brackets.
+  static String asOperand(String source) {
+    final children = MathDocument.parse(source).root.children;
+    if (children.length == 1) {
+      final only = children.single;
+      final isAtomic = switch (only) {
+        NumberNode() || ConstantNode() => true,
+        SymbolNode() || TextNode() || PowerNode() || RowNode() => false,
+        _ => only.closed,
+      };
+      if (isAtomic) return source;
+    }
+    return '($source)';
+  }
+
   /// The valid caret index nearest to [cursor] in [text].
   static int snap(String text, int cursor) =>
       MathDocument.parse(text).snap(cursor.clamp(0, text.length));

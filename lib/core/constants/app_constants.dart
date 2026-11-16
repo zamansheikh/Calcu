@@ -13,7 +13,10 @@ class AppConstants {
 class StorageKeys {
   StorageKeys._();
 
+  /// Saved results as bare values. Superseded by [savedEntries]; still read
+  /// once, to carry over what an earlier version saved.
   static const String savedValues = 'calculator.saved_values';
+  static const String savedEntries = 'calculator.saved_entries';
   static const String themeMode = 'theme.mode';
   static const String activeThemePackId = 'theme.active_pack_id';
   static const String ownedThemePackIds = 'theme.owned_pack_ids';

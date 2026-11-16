@@ -28,6 +28,7 @@ class MathLabel extends StatefulWidget {
     required this.fontSize,
     required this.color,
     this.fontWeight = FontWeight.w600,
+    this.maxWidth,
   });
 
   /// Expression source, in the calculator's own syntax.
@@ -35,6 +36,10 @@ class MathLabel extends StatefulWidget {
   final double fontSize;
   final Color color;
   final FontWeight fontWeight;
+
+  /// If the expression is wider than this, only its start is shown, fading
+  /// out at the cut.
+  final double? maxWidth;
 
   @override
   State<MathLabel> createState() => _MathLabelState();
@@ -73,6 +78,34 @@ class _MathLabelState extends State<MathLabel> {
       );
     }
     final layout = _layout!;
-    return CustomPaint(size: layout.size, painter: MathPainter(layout));
+    final painted =
+        CustomPaint(size: layout.size, painter: MathPainter(layout));
+
+    final maxWidth = widget.maxWidth;
+    if (maxWidth == null || layout.size.width <= maxWidth) return painted;
+
+    final fade = maxWidth < 54 ? maxWidth / 3 : 18.0;
+    return ShaderMask(
+      blendMode: BlendMode.dstIn,
+      shaderCallback: (bounds) => LinearGradient(
+        colors: const [_opaque, _opaque, _clear],
+        stops: [0, 1 - fade / bounds.width, 1],
+      ).createShader(bounds),
+      child: ClipRect(
+        child: SizedBox(
+          width: maxWidth,
+          height: layout.size.height,
+          child: OverflowBox(
+            alignment: Alignment.centerLeft,
+            minWidth: 0,
+            maxWidth: double.infinity,
+            child: painted,
+          ),
+        ),
+      ),
+    );
   }
+
+  static const _opaque = Color(0xFFFFFFFF);
+  static const _clear = Color(0x00FFFFFF);
 }

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../core/math/expression_editor.dart';
 import '../../core/services/calculator_engine.dart';
 import '../../core/utils/number_formatter.dart';
+import '../../data/models/saved_entry.dart';
 import '../../data/repositories/saved_values_repository.dart';
 import '../controllers/input_controller.dart';
 
@@ -30,7 +31,7 @@ class CalculatorProvider extends ChangeNotifier {
   })  : _engine = engine,
         _savedValuesRepository = savedValuesRepository {
     _input.addListener(_onInputChanged);
-    _savedValues = List<String>.from(_savedValuesRepository.read());
+    _savedEntries = List<SavedEntry>.of(_savedValuesRepository.read());
   }
 
   final CalculatorEngine _engine;
@@ -44,7 +45,7 @@ class CalculatorProvider extends ChangeNotifier {
   // The expression `_preview` was computed from.
   String _evaluatedText = '';
   bool _isCalculated = false;
-  late List<String> _savedValues;
+  late List<SavedEntry> _savedEntries;
 
   // ---------------------------------------------------------------- Getters
   InputController get input => _input;
@@ -80,7 +81,7 @@ class CalculatorProvider extends ChangeNotifier {
         ResultFormat.precise => ResultFormat.decimal,
       };
   bool get isCalculated => _isCalculated;
-  List<String> get savedValues => List.unmodifiable(_savedValues);
+  List<SavedEntry> get savedEntries => List.unmodifiable(_savedEntries);
 
   // ----------------------------------------------------------- Input events
   void insertNumber(String value) {
@@ -171,7 +172,10 @@ class CalculatorProvider extends ChangeNotifier {
     // form is saved as its decimal.
     final text =
         _format == ResultFormat.fraction ? _preview.display : output;
-    _savedValues = [..._savedValues, text];
+    _savedEntries = [
+      ..._savedEntries,
+      SavedEntry(value: text, expression: expression),
+    ];
     _persistSaved();
     _scrollSavedToEnd();
     HapticFeedback.mediumImpact();
@@ -185,7 +189,10 @@ class CalculatorProvider extends ChangeNotifier {
     final result = _engine.evaluate(expression);
     if (result.isError || result.display.isEmpty) return false;
     _preview = result;
-    _savedValues = [..._savedValues, result.display];
+    _savedEntries = [
+      ..._savedEntries,
+      SavedEntry(value: result.display, expression: expression),
+    ];
     _persistSaved();
     _scrollSavedToEnd();
     HapticFeedback.mediumImpact();
@@ -193,24 +200,53 @@ class CalculatorProvider extends ChangeNotifier {
     return true;
   }
 
+  /// Paste a saved result at the caret.
   void useSavedValue(int index) {
-    if (index < 0 || index >= _savedValues.length) return;
+    if (index < 0 || index >= _savedEntries.length) return;
     _afterEdit();
-    _input.insertText(_savedValues[index]);
+    _input.insertText(_savedEntries[index].value);
     HapticFeedback.selectionClick();
   }
 
-  void deleteSavedValue(int index) {
-    if (index < 0 || index >= _savedValues.length) return;
-    _savedValues = [..._savedValues]..removeAt(index);
+  /// Paste the expression a saved result came from. Into an empty display it
+  /// goes in exactly as it was written, ready to edit; into the middle of
+  /// another expression it is bracketed where it needs to be, so that it
+  /// still stands for the same value there.
+  void useSavedExpression(int index) {
+    if (index < 0 || index >= _savedEntries.length) return;
+    final source = _savedEntries[index].expression;
+    if (source == null) return useSavedValue(index);
+    _afterEdit();
+    _input.insertText(
+      expression.isEmpty ? source : ExpressionEditor.asOperand(source),
+    );
+    HapticFeedback.selectionClick();
+  }
+
+  /// Removes a saved entry and returns it, so the caller can offer to put
+  /// it back with [restoreSavedEntry].
+  SavedEntry? deleteSavedValue(int index) {
+    if (index < 0 || index >= _savedEntries.length) return null;
+    final removed = _savedEntries[index];
+    _savedEntries = [..._savedEntries]..removeAt(index);
     _persistSaved();
     HapticFeedback.lightImpact();
+    notifyListeners();
+    return removed;
+  }
+
+  /// Puts [entry] back where it was, at [index].
+  void restoreSavedEntry(int index, SavedEntry entry) {
+    final at = index.clamp(0, _savedEntries.length);
+    _savedEntries = [..._savedEntries]..insert(at, entry);
+    _persistSaved();
+    HapticFeedback.selectionClick();
     notifyListeners();
   }
 
   void clearSavedValues() {
-    if (_savedValues.isEmpty) return;
-    _savedValues = const <String>[];
+    if (_savedEntries.isEmpty) return;
+    _savedEntries = const <SavedEntry>[];
     _persistSaved();
     HapticFeedback.heavyImpact();
     notifyListeners();
@@ -235,7 +271,7 @@ class CalculatorProvider extends ChangeNotifier {
   }
 
   void _persistSaved() {
-    _savedValuesRepository.write(_savedValues);
+    _savedValuesRepository.write(_savedEntries);
   }
 
   void _scrollSavedToEnd() {
