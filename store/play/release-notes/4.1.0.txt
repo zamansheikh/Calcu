@@ -1,0 +1,22 @@
+<en-US>
+New in 4.1.0
+• Math looks the way you write it: fractions, roots and powers are typeset as you type
+• New keys: fraction, root, absolute value, log, π and e
+• Press = again to see the answer as a fraction or rounded
+• Huge numbers now give an answer instead of an error
+• Saved results keep their equation; paste either one back
+• 3 new free themes, with a swipe preview before you choose
+• New icon and About page
+• Fixed: cursor drifting on long numbers, and % after brackets
+</en-US>
+<bn-BD>
+নতুন সংস্করণ ৪.১.০
+• অঙ্ক দেখায় খাতায় লেখার মতো: ভগ্নাংশ, রুট আর পাওয়ার টাইপ করার সাথে সাথেই সাজিয়ে দেখায়
+• নতুন বোতাম: ভগ্নাংশ, রুট, পরম মান, লগ, π আর e
+• = আবার চাপলে উত্তর ভগ্নাংশে বা তিন ঘর পর্যন্ত
+• বিশাল বড় সংখ্যাতেও এরর নয়, উত্তর দেখায়
+• সেভ করা উত্তরের সাথে হিসাবটাও থাকে; যেটা দরকার বসিয়ে নিন
+• ৩টি নতুন ফ্রি থিম; বেছে নেওয়ার আগে সোয়াইপ করে দেখুন
+• নতুন আইকন ও পরিচিতি পাতা
+• লম্বা সংখ্যায় কার্সর সরে যাওয়া আর ব্র্যাকেটের পরে % এর সমস্যা ঠিক করা হয়েছে
+</bn-BD>
