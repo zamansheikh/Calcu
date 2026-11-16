@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../theme/calcu_palette.dart';
 import '../providers/calculator_provider.dart';
 import 'animated_tap.dart';
+import 'keypad_toolbar.dart';
 
 /// Horizontal strip of saved-result chips. Tap to insert into the expression;
 /// long-press to delete.
@@ -19,12 +20,23 @@ class SavedValuesStrip extends StatelessWidget {
         if (calc.savedValues.isEmpty) {
           return _EmptyHint(palette: palette);
         }
-        return SizedBox(
-          height: 44.r,
+        // Chips that run past the end fade out rather than being cut off.
+        // The list's own end padding is as wide as the fade, so the last
+        // chip is fully visible once scrolled to.
+        final fade = 22.r;
+        return ShaderMask(
+          blendMode: BlendMode.dstIn,
+          shaderCallback: (bounds) => LinearGradient(
+            colors: const [Colors.white, Colors.white, Colors.transparent],
+            stops: [0, 1 - fade / bounds.width, 1],
+          ).createShader(bounds),
           child: ListView.separated(
             controller: calc.savedScrollController,
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 18.r),
+            padding: EdgeInsets.only(
+              left: KeypadToolbar.edgeInset,
+              right: fade,
+            ),
             itemCount: calc.savedValues.length,
             separatorBuilder: (context, index) => SizedBox(width: 8.r),
             itemBuilder: (context, index) {
@@ -80,29 +92,23 @@ class _SavedChip extends StatelessWidget {
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.r, vertical: 8.r),
+        padding: EdgeInsets.symmetric(horizontal: 12.r),
         decoration: BoxDecoration(
           color: palette.savedChip,
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(KeypadToolbar.itemRadius),
           border: Border.all(color: palette.border),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 6.r, vertical: 2.r),
-              decoration: BoxDecoration(
-                color: palette.savedChipText.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(6.r),
-              ),
-              child: Text(
-                'M${index + 1}',
-                style: TextStyle(
-                  fontFamily: 'Urbanist',
-                  fontSize: 10.sp,
-                  fontWeight: FontWeight.w700,
-                  color: palette.savedChipText,
-                ),
+            Text(
+              'M${index + 1}',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.3,
+                color: palette.savedChipText.withValues(alpha: 0.55),
               ),
             ),
             SizedBox(width: 8.r),
@@ -128,25 +134,26 @@ class _EmptyHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 44.r,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 22.r),
-        child: Row(
-          children: [
-            Icon(Icons.bookmark_border,
-                size: 16.sp, color: palette.placeholderText),
-            SizedBox(width: 6.r),
-            Text(
+    return Padding(
+      padding: EdgeInsets.only(left: KeypadToolbar.edgeInset + 4.r),
+      child: Row(
+        children: [
+          Icon(Icons.bookmark_border,
+              size: 16.sp, color: palette.placeholderText),
+          SizedBox(width: 6.r),
+          Flexible(
+            child: Text(
               'Long-press the result to save it here',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 12.sp,
                 color: palette.placeholderText,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

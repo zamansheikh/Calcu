@@ -5,9 +5,12 @@ import '../../core/math/expression_editor.dart';
 import '../providers/calculator_provider.dart';
 import 'calculator_button.dart';
 
-/// Calculator keypad: a slim row of function keys above the 6×4 grid. Each
-/// row stretches to fill its share of the available vertical space; each
-/// button stretches across its row.
+/// Calculator keypad, laid out on a single four-column grid.
+///
+/// The lower five rows are the familiar pad — digits on the left, operators
+/// down the right, a wide zero. The two slimmer rows above it hold the
+/// functions. Every row uses the same four columns, so the keys line up from
+/// top to bottom.
 class ButtonGrid extends StatelessWidget {
   const ButtonGrid({super.key});
 
@@ -24,146 +27,125 @@ class ButtonGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final calc = context.read<CalculatorProvider>();
+
+    Widget digit(String value, {int flex = 1}) => CalculatorButton(
+          label: value,
+          flex: flex,
+          onTap: () => calc.insertNumber(value),
+        );
+
+    Widget operator(String label, String value) => CalculatorButton(
+          label: label,
+          style: CalculatorButtonStyle.operator,
+          onTap: () => calc.insertOperator(value),
+        );
+
+    // A function key. Its face is the notation it inserts, typeset the way
+    // the display will draw it, with letters standing in for the operands.
+    Widget function({
+      String? math,
+      String? label,
+      String? name,
+      required VoidCallback onTap,
+      String? hint,
+      VoidCallback? onLongPress,
+    }) =>
+        CalculatorButton(
+          math: math,
+          label: label,
+          semanticLabel: name,
+          hint: hint,
+          dense: true,
+          style: CalculatorButtonStyle.special,
+          onTap: onTap,
+          onLongPress: onLongPress,
+        );
+
     return Column(
       children: [
-        // Function row: ◀ ▶ a/b |x| log π
-        _row(flex: 7, [
-          CalculatorButton(
-            icon: Icons.chevron_left_rounded,
-            style: CalculatorButtonStyle.special,
-            compact: true,
-            onTap: calc.moveCursorLeft,
-          ),
-          CalculatorButton(
-            icon: Icons.chevron_right_rounded,
-            style: CalculatorButtonStyle.special,
-            compact: true,
-            onTap: calc.moveCursorRight,
-          ),
-          CalculatorButton(
-            label: 'a/b',
-            style: CalculatorButtonStyle.special,
-            compact: true,
+        // a/b  xʸ  √x  |x|
+        _row(flex: 8, [
+          function(
+            math: 'frac(a,b)',
+            name: 'Fraction',
             onTap: () => calc.insertTemplate(MathTemplate.fraction),
           ),
-          CalculatorButton(
-            label: '|x|',
-            style: CalculatorButtonStyle.special,
-            compact: true,
+          function(
+            math: 'x^y',
+            name: 'Power',
+            onTap: () => calc.insertSymbol('^'),
+          ),
+          function(
+            math: '√(x)',
+            name: 'Square root',
+            onTap: () => calc.insertTemplate(MathTemplate.squareRoot),
+          ),
+          function(
+            math: 'abs(x)',
+            name: 'Absolute value',
             onTap: () => calc.insertTemplate(MathTemplate.absolute),
           ),
-          CalculatorButton(
-            label: 'log',
-            subLabel: 'ln',
-            style: CalculatorButtonStyle.special,
-            compact: true,
+        ]),
+        // logₐ(x)  π  (  )
+        _row(flex: 8, [
+          function(
+            math: 'log(a,x)',
+            name: 'Logarithm',
+            hint: 'ln',
             onTap: () => calc.insertTemplate(MathTemplate.logarithm),
             onLongPress: () => calc.insertTemplate(MathTemplate.naturalLog),
           ),
-          CalculatorButton(
+          function(
             label: 'π',
-            subLabel: 'e',
-            style: CalculatorButtonStyle.special,
-            compact: true,
+            hint: 'e',
             onTap: () => calc.insertSymbol('π'),
             onLongPress: () => calc.insertSymbol('e'),
           ),
+          function(label: '(', onTap: () => calc.insertSymbol('(')),
+          function(label: ')', onTap: () => calc.insertSymbol(')')),
         ]),
-        // Row 1: AC ( ) ⌫
+        // AC  ⌫  %  ÷
         _row([
           CalculatorButton(
             label: 'AC',
+            semanticLabel: 'Clear all',
             style: CalculatorButtonStyle.clear,
             onTap: calc.clearAll,
           ),
           CalculatorButton(
-            label: '(',
-            style: CalculatorButtonStyle.special,
-            onTap: () => calc.insertSymbol('('),
-          ),
-          CalculatorButton(
-            label: ')',
-            style: CalculatorButtonStyle.special,
-            onTap: () => calc.insertSymbol(')'),
-          ),
-          CalculatorButton(
             icon: Icons.backspace_outlined,
+            semanticLabel: 'Delete',
             style: CalculatorButtonStyle.special,
+            repeat: true,
             onTap: calc.backspace,
-          ),
-        ]),
-        // Row 2: x^  √  %  ÷
-        _row([
-          CalculatorButton(
-            label: 'xʸ',
-            style: CalculatorButtonStyle.special,
-            onTap: () => calc.insertSymbol('^'),
-          ),
-          CalculatorButton(
-            label: '√',
-            style: CalculatorButtonStyle.special,
-            onTap: () => calc.insertTemplate(MathTemplate.squareRoot),
           ),
           CalculatorButton(
             label: '%',
-            subLabel: 'mod',
+            hint: 'mod',
             style: CalculatorButtonStyle.special,
             onTap: () => calc.insertSymbol('%'),
             onLongPress: () => calc.insertTemplate(MathTemplate.modulo),
           ),
-          CalculatorButton(
-            label: '÷',
-            style: CalculatorButtonStyle.operator,
-            onTap: () => calc.insertOperator('÷'),
-          ),
+          operator('÷', '÷'),
         ]),
-        // Row 3: 7 8 9 ×
+        _row([digit('7'), digit('8'), digit('9'), operator('×', '×')]),
+        _row([digit('4'), digit('5'), digit('6'), operator('−', '-')]),
+        _row([digit('1'), digit('2'), digit('3'), operator('+', '+')]),
+        // 0 (wide)  .  =
         _row([
-          CalculatorButton(label: '7', onTap: () => calc.insertNumber('7')),
-          CalculatorButton(label: '8', onTap: () => calc.insertNumber('8')),
-          CalculatorButton(label: '9', onTap: () => calc.insertNumber('9')),
-          CalculatorButton(
-            label: '×',
-            style: CalculatorButtonStyle.operator,
-            onTap: () => calc.insertOperator('×'),
-          ),
-        ]),
-        // Row 4: 4 5 6 -
-        _row([
-          CalculatorButton(label: '4', onTap: () => calc.insertNumber('4')),
-          CalculatorButton(label: '5', onTap: () => calc.insertNumber('5')),
-          CalculatorButton(label: '6', onTap: () => calc.insertNumber('6')),
-          CalculatorButton(
-            label: '−',
-            style: CalculatorButtonStyle.operator,
-            onTap: () => calc.insertOperator('-'),
-          ),
-        ]),
-        // Row 5: 1 2 3 +
-        _row([
-          CalculatorButton(label: '1', onTap: () => calc.insertNumber('1')),
-          CalculatorButton(label: '2', onTap: () => calc.insertNumber('2')),
-          CalculatorButton(label: '3', onTap: () => calc.insertNumber('3')),
-          CalculatorButton(
-            label: '+',
-            style: CalculatorButtonStyle.operator,
-            onTap: () => calc.insertOperator('+'),
-          ),
-        ]),
-        // Row 6: 0(wide) . =
-        _row([
-          CalculatorButton(
-            label: '0',
-            flex: 2,
-            onTap: () => calc.insertNumber('0'),
-          ),
+          digit('0', flex: 2),
           CalculatorButton(label: '.', onTap: () => calc.insertSymbol('.')),
-          CalculatorButton(
-            label: '=',
-            subLabel: 'precise',
-            style: CalculatorButtonStyle.equals,
-            onTap: calc.calculate,
-            onLongPress: calc.calculatePrecise,
+          // Once a result is showing, the corner names the form the next
+          // press switches it to: fraction, precise, decimal.
+          Selector<CalculatorProvider, ResultFormat?>(
+            selector: (context, calc) => calc.nextResultFormat,
+            builder: (context, next, _) => CalculatorButton(
+              label: '=',
+              hint: next?.name,
+              style: CalculatorButtonStyle.equals,
+              onTap: calc.calculate,
+              onLongPress: calc.calculatePrecise,
+            ),
           ),
         ]),
       ],

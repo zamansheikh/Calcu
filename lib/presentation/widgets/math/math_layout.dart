@@ -14,6 +14,7 @@ class MathStyle {
     required this.placeholderColor,
     this.fontFamily = 'Urbanist',
     this.fontWeight = FontWeight.w600,
+    this.placeholderStroke = 0.035,
   });
 
   /// Size of text on the main line. Scripts and fractions derive from it.
@@ -25,12 +26,16 @@ class MathStyle {
   final String fontFamily;
   final FontWeight fontWeight;
 
+  /// Line weight of that box, as a fraction of the font size it is drawn at.
+  final double placeholderStroke;
+
   MathStyle copyWith({double? fontSize, Color? color}) => MathStyle(
         fontSize: fontSize ?? this.fontSize,
         color: color ?? this.color,
         placeholderColor: placeholderColor,
         fontFamily: fontFamily,
         fontWeight: fontWeight,
+        placeholderStroke: placeholderStroke,
       );
 }
 
@@ -147,7 +152,7 @@ class MathLayout {
         row.stops.add((node.start, 0));
         return row;
       }
-      final placeholder = _PlaceholderBox(fontSize, style.placeholderColor);
+      final placeholder = _placeholder(fontSize);
       row.add(placeholder, 0);
       row.stops.add((node.start, placeholder.width / 2));
       row.width = placeholder.width;
@@ -162,7 +167,7 @@ class MathLayout {
     for (final child in node.children) {
       if (child is PowerNode && previousBox == null) {
         // A power with nothing to raise: show where the base goes.
-        final base = _PlaceholderBox(fontSize, style.placeholderColor);
+        final base = _placeholder(fontSize);
         row.add(base, x);
         x += base.width;
         previousBox = base;
@@ -273,6 +278,12 @@ class MathLayout {
         return _row(node, fontSize);
     }
   }
+
+  _PlaceholderBox _placeholder(double fontSize) => _PlaceholderBox(
+        fontSize,
+        style.placeholderColor,
+        math.max(1.0, style.placeholderStroke * fontSize),
+      );
 
   double _scriptSize(double fontSize) =>
       math.max(fontSize * _scriptScale, _minFontSize);
@@ -494,7 +505,7 @@ class _ScriptBox extends _Box {
 
 /// The outlined box that marks a slot with nothing in it yet.
 class _PlaceholderBox extends _Box {
-  _PlaceholderBox(this.fontSize, this.color) {
+  _PlaceholderBox(this.fontSize, this.color, this.stroke) {
     width = 0.56 * fontSize;
     ascent = 0.70 * fontSize;
     descent = 0.02 * fontSize;
@@ -502,6 +513,7 @@ class _PlaceholderBox extends _Box {
 
   final double fontSize;
   final Color color;
+  final double stroke;
 
   @override
   void paint(Canvas canvas) {
@@ -515,7 +527,7 @@ class _PlaceholderBox extends _Box {
       RRect.fromRectAndRadius(rect, Radius.circular(0.09 * fontSize)),
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = math.max(1, 0.035 * fontSize)
+        ..strokeWidth = stroke
         ..color = color,
     );
   }

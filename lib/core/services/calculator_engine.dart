@@ -1,5 +1,6 @@
 import 'package:math_expressions/math_expressions.dart';
 
+import '../math/exact_form.dart';
 import '../math/math_document.dart';
 import '../utils/number_formatter.dart';
 
@@ -10,11 +11,17 @@ class CalculationResult {
     required this.display,
     required this.value,
     required this.isError,
+    this.exact,
   });
 
   final String display;
   final double? value;
   final bool isError;
+
+  /// The result as a fraction, root or multiple of π, written as expression
+  /// source (`frac(3,4)`), when it has such a form. Null for whole numbers
+  /// and for values with no simple closed form.
+  final String? exact;
 
   static const CalculationResult empty =
       CalculationResult._(display: '', value: null, isError: false);
@@ -22,11 +29,20 @@ class CalculationResult {
   static const CalculationResult error =
       CalculationResult._(display: 'Error', value: null, isError: true);
 
-  factory CalculationResult.success(double value, {int? decimals}) {
+  factory CalculationResult.success(
+    double value, {
+    int? decimals,
+    String? exact,
+  }) {
     final text = decimals == null
         ? NumberFormatter.formatResult(value)
         : NumberFormatter.formatPrecise(value, decimals);
-    return CalculationResult._(display: text, value: value, isError: false);
+    return CalculationResult._(
+      display: text,
+      value: value,
+      isError: false,
+      exact: exact,
+    );
   }
 }
 
@@ -50,9 +66,15 @@ class CalculatorEngine {
       final parser = ShuntingYardParser();
       final exp = parser.parse(expression);
       final evaluator = RealEvaluator();
-      final result = _trimNoise(evaluator.evaluate(exp).toDouble());
+      final raw = evaluator.evaluate(exp).toDouble();
+      final result = _trimNoise(raw);
       if (result.isNaN || result.isInfinite) return CalculationResult.error;
-      return CalculationResult.success(result, decimals: decimals);
+      return CalculationResult.success(
+        result,
+        decimals: decimals,
+        // From the unrounded value: the closed form needs every digit.
+        exact: ExactForm.of(raw),
+      );
     } catch (_) {
       return CalculationResult.error;
     }

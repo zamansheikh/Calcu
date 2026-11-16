@@ -5,8 +5,8 @@ import '../../theme/calcu_palette.dart';
 import '../widgets/app_top_bar.dart';
 import '../widgets/button_grid.dart';
 import '../widgets/expression_display.dart';
+import '../widgets/keypad_toolbar.dart';
 import '../widgets/result_display.dart';
-import '../widgets/saved_values_strip.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -61,18 +61,18 @@ class _HomePageState extends State<HomePage>
                     child: Column(
                       children: [
                         Expanded(
-                          flex: 5,
+                          flex: 6,
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 10.r),
                             child: const ExpressionDisplay(),
                           ),
                         ),
                         Expanded(
-                          flex: 2,
+                          flex: 3,
                           child: const ResultDisplay(),
                         ),
                         SizedBox(height: 6.r),
-                        const SavedValuesStrip(),
+                        const KeypadToolbar(),
                         SizedBox(height: 8.r),
                         Expanded(
                           flex: 15,

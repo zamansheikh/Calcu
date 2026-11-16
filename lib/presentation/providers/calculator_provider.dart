@@ -3,12 +3,27 @@ import 'package:flutter/services.dart';
 
 import '../../core/math/expression_editor.dart';
 import '../../core/services/calculator_engine.dart';
+import '../../core/utils/number_formatter.dart';
 import '../../data/repositories/saved_values_repository.dart';
 import '../controllers/input_controller.dart';
+
+/// How the result is written. Pressing `=` again steps through these.
+enum ResultFormat {
+  /// The plain decimal: 0.75.
+  decimal,
+
+  /// The closed form, when there is one: ¾, √2, π/2.
+  fraction,
+
+  /// Rounded to three decimal places: 0.750.
+  precise,
+}
 
 /// Mediates between the input controller, the calculator engine, and the
 /// saved-values repository. UI subscribes here for everything it needs.
 class CalculatorProvider extends ChangeNotifier {
+  static const _preciseDecimals = 3;
+
   CalculatorProvider({
     required CalculatorEngine engine,
     required SavedValuesRepository savedValuesRepository,
@@ -25,6 +40,9 @@ class CalculatorProvider extends ChangeNotifier {
   final ScrollController _savedScrollController = ScrollController();
 
   CalculationResult _preview = CalculationResult.empty;
+  ResultFormat _format = ResultFormat.decimal;
+  // The expression `_preview` was computed from.
+  String _evaluatedText = '';
   bool _isCalculated = false;
   late List<String> _savedValues;
 
@@ -32,8 +50,35 @@ class CalculatorProvider extends ChangeNotifier {
   InputController get input => _input;
   ScrollController get savedScrollController => _savedScrollController;
   String get expression => _input.input;
-  String get output => _preview.display;
   bool get hasError => _preview.isError;
+
+  /// The format the result is currently shown in.
+  ResultFormat get resultFormat => _format;
+
+  /// The result in [resultFormat]. For [ResultFormat.fraction] this is
+  /// expression source to typeset; otherwise it is plain text.
+  String get output {
+    final value = _preview.value;
+    return switch (_format) {
+      ResultFormat.fraction => _preview.exact ?? _preview.display,
+      ResultFormat.precise when value != null =>
+        NumberFormatter.formatPrecise(value, _preciseDecimals),
+      _ => _preview.display,
+    };
+  }
+
+  /// What pressing `=` again will switch the result to, or null while there
+  /// is no finished result to reformat.
+  ResultFormat? get nextResultFormat =>
+      _isCalculated && _preview.value != null ? _formatAfter(_format) : null;
+
+  ResultFormat _formatAfter(ResultFormat format) => switch (format) {
+        ResultFormat.decimal => _preview.exact != null
+            ? ResultFormat.fraction
+            : ResultFormat.precise,
+        ResultFormat.fraction => ResultFormat.precise,
+        ResultFormat.precise => ResultFormat.decimal,
+      };
   bool get isCalculated => _isCalculated;
   List<String> get savedValues => List.unmodifiable(_savedValues);
 
@@ -81,6 +126,8 @@ class CalculatorProvider extends ChangeNotifier {
   void clearAll() {
     _input.clear();
     _preview = CalculationResult.empty;
+    _evaluatedText = '';
+    _format = ResultFormat.decimal;
     _isCalculated = false;
     HapticFeedback.mediumImpact();
     notifyListeners();
@@ -89,18 +136,27 @@ class CalculatorProvider extends ChangeNotifier {
   void moveCursor(int position) => _input.moveCursorTo(position);
 
   // ----------------------------------------------------------- Calculations
+  /// `=`. The first press settles the result; each press after that, until
+  /// the expression is edited, shows it in the next [ResultFormat].
   void calculate() {
     if (expression.isEmpty) return;
-    _preview = _engine.evaluate(expression);
-    _isCalculated = true;
+    final next = nextResultFormat;
+    if (next != null) {
+      _format = next;
+    } else {
+      _preview = _engine.evaluate(expression);
+      _format = ResultFormat.decimal;
+      _isCalculated = true;
+    }
     HapticFeedback.mediumImpact();
     notifyListeners();
   }
 
-  /// Long-press `=`: evaluate to 3 decimal places.
+  /// Long-press `=`: go straight to 3 decimal places.
   void calculatePrecise() {
     if (expression.isEmpty) return;
-    _preview = _engine.evaluate(expression, decimals: 3);
+    _preview = _engine.evaluate(expression);
+    _format = ResultFormat.precise;
     _isCalculated = true;
     HapticFeedback.heavyImpact();
     notifyListeners();
@@ -111,7 +167,11 @@ class CalculatorProvider extends ChangeNotifier {
   /// the result is an error — callers can use that to skip a snackbar.
   bool saveCurrentResult() {
     if (_preview.isError || _preview.display.isEmpty) return false;
-    _savedValues = [..._savedValues, _preview.display];
+    // A saved value is inserted into expressions as a number, so the closed
+    // form is saved as its decimal.
+    final text =
+        _format == ResultFormat.fraction ? _preview.display : output;
+    _savedValues = [..._savedValues, text];
     _persistSaved();
     _scrollSavedToEnd();
     HapticFeedback.mediumImpact();
@@ -164,7 +224,13 @@ class CalculatorProvider extends ChangeNotifier {
   }
 
   void _onInputChanged() {
-    _preview = _engine.evaluate(expression);
+    // Also runs when only the caret moved, which leaves the result alone.
+    if (expression != _evaluatedText) {
+      _evaluatedText = expression;
+      _preview = _engine.evaluate(expression);
+      _format = ResultFormat.decimal;
+      _isCalculated = false;
+    }
     notifyListeners();
   }
 

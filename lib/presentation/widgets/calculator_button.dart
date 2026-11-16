@@ -3,32 +3,50 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/calcu_palette.dart';
 import 'animated_tap.dart';
+import 'math/math_label.dart';
 
 enum CalculatorButtonStyle { number, special, operator, equals, clear }
 
-/// Stateless, theme-aware calculator button. Visual properties are derived
-/// from the active `CalcuPalette` so swapping themes never requires touching
-/// this widget.
+/// Stateless, theme-aware calculator key. Visual properties are derived from
+/// the active `CalcuPalette` so swapping themes never requires touching this
+/// widget.
+///
+/// A key shows one of [label] (plain text), [icon], or [math] — expression
+/// source typeset the way the display would draw it, so a structure key
+/// looks like the structure it inserts.
 class CalculatorButton extends StatelessWidget {
   const CalculatorButton({
     super.key,
     required this.onTap,
     this.label,
     this.icon,
+    this.math,
+    this.hint,
+    this.semanticLabel,
     this.onLongPress,
+    this.repeat = false,
+    this.dense = false,
     this.style = CalculatorButtonStyle.number,
     this.flex = 1,
-    this.subLabel,
-    this.compact = false,
   });
 
-  /// Smaller type and tighter corners, for the function row above the keypad.
-  final bool compact;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
   final String? label;
-  final String? subLabel;
   final IconData? icon;
+  final String? math;
+
+  /// What a long press does, shown small in the key's corner.
+  final String? hint;
+
+  /// Spoken name for keys whose face is a glyph rather than readable text.
+  final String? semanticLabel;
+
+  /// Holding the key repeats [onTap] instead of calling [onLongPress].
+  final bool repeat;
+
+  /// Smaller face, for the slim control row above the grid.
+  final bool dense;
   final CalculatorButtonStyle style;
   final int flex;
 
@@ -39,10 +57,7 @@ class CalculatorButton extends StatelessWidget {
       case CalculatorButtonStyle.special:
         return (background: p.specialButton, foreground: p.specialButtonText);
       case CalculatorButtonStyle.operator:
-        return (
-          background: p.operatorButton,
-          foreground: p.operatorButtonText,
-        );
+        return (background: p.operatorButton, foreground: p.operatorButtonText);
       case CalculatorButtonStyle.equals:
         return (background: p.equalsButton, foreground: p.equalsButtonText);
       case CalculatorButtonStyle.clear:
@@ -58,61 +73,58 @@ class CalculatorButton extends StatelessWidget {
 
     return Expanded(
       flex: flex,
-      child: Padding(
-        padding: EdgeInsets.all(compact ? 4.r : 5.r),
+      child: Semantics(
+        button: true,
+        label: semanticLabel,
+        excludeSemantics: semanticLabel != null,
+        // The gap between keys is inside the tap target, so a press that
+        // lands between two keys still goes to the nearer one.
         child: AnimatedTap(
           onTap: onTap,
           onLongPress: onLongPress,
-          child: Container(
-            decoration: BoxDecoration(
-              color: colors.background,
-              borderRadius: BorderRadius.circular(compact ? 16.r : 22.r),
-              boxShadow: [
-                BoxShadow(
-                  color: isEmphasis
-                      ? colors.background.withValues(alpha: 0.35)
-                      : Colors.black.withValues(alpha: 0.05),
-                  blurRadius: isEmphasis ? 16 : 6,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Center(
-              child: icon != null
-                  ? Icon(
-                      icon,
-                      size: compact ? 24.sp : 26.sp,
-                      color: colors.foreground,
-                    )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          label ?? '',
-                          style: TextStyle(
-                            color: colors.foreground,
-                            fontFamily: 'Urbanist',
-                            fontSize: _fontSize(),
-                            fontWeight: _fontWeight(),
-                            height: 1,
-                          ),
-                        ),
-                        if (subLabel != null)
-                          Padding(
-                            padding: EdgeInsets.only(top: compact ? 1.r : 2.r),
-                            child: Text(
-                              subLabel!,
-                              style: TextStyle(
-                                color: colors.foreground.withValues(alpha: 0.6),
-                                fontFamily: 'Urbanist',
-                                fontSize: compact ? 9.sp : 10.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                      ],
+          repeat: repeat,
+          child: Padding(
+            padding: EdgeInsets.all(dense ? 4.r : 4.5.r),
+            child: Container(
+              decoration: BoxDecoration(
+                color: colors.background,
+                borderRadius: BorderRadius.circular(dense ? 16.r : 20.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: isEmphasis
+                        ? colors.background.withValues(alpha: 0.35)
+                        : Colors.black.withValues(alpha: 0.05),
+                    blurRadius: isEmphasis ? 16 : 6,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Center(
+                    child: Padding(
+                      padding: _facePadding(),
+                      child: _face(colors.foreground),
                     ),
+                  ),
+                  if (hint != null)
+                    Positioned(
+                      top: dense ? 4.r : 7.r,
+                      right: dense ? 8.r : 10.r,
+                      child: Text(
+                        hint!,
+                        style: TextStyle(
+                          color: colors.foreground.withValues(alpha: 0.75),
+                          fontFamily: 'Urbanist',
+                          fontSize: dense ? 10.5.sp : 11.5.sp,
+                          fontWeight: FontWeight.w700,
+                          height: 1,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -120,8 +132,50 @@ class CalculatorButton extends StatelessWidget {
     );
   }
 
+  EdgeInsets _facePadding() {
+    if (math == null) {
+      return EdgeInsets.symmetric(horizontal: 4.r, vertical: 5.r);
+    }
+    // A typeset face can be as wide as the key, so keep it clear of the
+    // edges. If the key also has a hint, the face sits a little lower and
+    // leaves the top-right corner to it.
+    if (hint == null) {
+      return EdgeInsets.symmetric(horizontal: 9.r, vertical: 5.r);
+    }
+    return EdgeInsets.fromLTRB(12.r, 12.r, 12.r, 4.r);
+  }
+
+  Widget _face(Color foreground) {
+    if (icon != null) {
+      return Icon(icon, size: dense ? 24.sp : 26.sp, color: foreground);
+    }
+    final math = this.math;
+    if (math != null) {
+      // Scale down rather than overflow: a stacked fraction is taller than a
+      // digit, and a logarithm wider.
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        child: MathLabel(
+          math,
+          fontSize: dense ? 23.sp : 27.sp,
+          color: foreground,
+        ),
+      );
+    }
+    return Text(
+      label ?? '',
+      style: TextStyle(
+        color: foreground,
+        fontFamily: 'Urbanist',
+        fontSize: _fontSize(),
+        fontWeight: _fontWeight(),
+        height: 1,
+      ),
+    );
+  }
+
   double _fontSize() {
-    if (compact) return 18.sp;
+    if (dense) return 19.sp;
     switch (style) {
       case CalculatorButtonStyle.equals:
         return 30.sp;
@@ -137,8 +191,6 @@ class CalculatorButton extends StatelessWidget {
       case CalculatorButtonStyle.equals:
       case CalculatorButtonStyle.operator:
         return FontWeight.w700;
-      case CalculatorButtonStyle.number:
-        return FontWeight.w600;
       default:
         return FontWeight.w600;
     }

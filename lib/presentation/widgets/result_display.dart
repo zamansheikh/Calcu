@@ -5,8 +5,12 @@ import 'package:provider/provider.dart';
 import '../../core/utils/number_formatter.dart';
 import '../../theme/calcu_palette.dart';
 import '../providers/calculator_provider.dart';
+import 'math/math_label.dart';
 
-/// Live preview of the result. Long-press saves it as a chip; tap copies.
+/// Live preview of the result. Long-press saves it as a chip.
+///
+/// A decimal is drawn as text. The fraction form (¾, √2, π/2) is expression
+/// source, and is typeset by the same engine as the expression above it.
 class ResultDisplay extends StatelessWidget {
   const ResultDisplay({super.key});
 
@@ -17,6 +21,9 @@ class ResultDisplay extends StatelessWidget {
       builder: (context, calc, _) {
         final raw = calc.output;
         final showPlaceholder = raw.isEmpty;
+        final isMath = !showPlaceholder &&
+            !calc.hasError &&
+            calc.resultFormat == ResultFormat.fraction;
         final formatted = showPlaceholder
             ? '0'
             : NumberFormatter.addThousandsSeparators(raw);
@@ -31,7 +38,7 @@ class ResultDisplay extends StatelessWidget {
           onLongPress: () => calc.saveCurrentResult(),
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.fromLTRB(18.r, 12.r, 18.r, 12.r),
+            padding: EdgeInsets.fromLTRB(18.r, 4.r, 18.r, 4.r),
             child: Align(
               alignment: Alignment.centerRight,
               child: AnimatedSwitcher(
@@ -47,7 +54,7 @@ class ResultDisplay extends StatelessWidget {
                   ),
                 ),
                 child: SingleChildScrollView(
-                  key: ValueKey(formatted),
+                  key: ValueKey(raw),
                   scrollDirection: Axis.horizontal,
                   reverse: true,
                   physics: const BouncingScrollPhysics(),
@@ -67,16 +74,31 @@ class ResultDisplay extends StatelessWidget {
                             ),
                           ),
                         ),
-                      Text(
-                        formatted,
-                        style: TextStyle(
-                          fontFamily: 'Urbanist',
-                          fontSize: formatted.length > 12 ? 28.sp : 34.sp,
-                          fontWeight: FontWeight.w700,
-                          color: color,
-                          letterSpacing: -0.5,
+                      if (isMath)
+                        // A stacked fraction is taller than a line of
+                        // digits; shrink it to the section's height if the
+                        // screen is short rather than let it be clipped.
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: MathLabel(
+                            raw,
+                            fontSize: 36.sp,
+                            fontWeight: FontWeight.w700,
+                            color: color,
+                          ),
+                        )
+                      else
+                        Text(
+                          formatted,
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: formatted.length > 12 ? 28.sp : 34.sp,
+                            fontWeight: FontWeight.w700,
+                            color: color,
+                            letterSpacing: -0.5,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),

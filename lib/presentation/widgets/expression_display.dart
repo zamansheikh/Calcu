@@ -6,6 +6,7 @@ import '../../core/math/math_document.dart';
 import '../../core/utils/number_formatter.dart';
 import '../../theme/calcu_palette.dart';
 import '../providers/calculator_provider.dart';
+import 'math/math_label.dart';
 import 'math/math_layout.dart';
 
 /// Top half of the display: the expression, typeset the way it would be
@@ -25,6 +26,10 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
     with SingleTickerProviderStateMixin {
   /// A tall expression is shrunk to fit the display, but not below this.
   static const _minFitScale = 0.45;
+
+  /// A long one is shrunk less far: past this it scrolls instead, since
+  /// digits that small are harder to read than a line that pans.
+  static const _minWidthFitScale = 0.62;
 
   final GlobalKey _paintKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
@@ -58,12 +63,19 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
   MathLayout _buildLayout(
     MathDocument document,
     MathStyle style,
-    double maxHeight,
+    Size available,
   ) {
     var layout = MathLayout(document, style);
-    if (maxHeight.isFinite && layout.size.height > maxHeight) {
-      final scale =
-          (maxHeight / layout.size.height).clamp(_minFitScale, 1.0);
+    var scale = 1.0;
+    if (available.height.isFinite && layout.size.height > available.height) {
+      scale = (available.height / layout.size.height).clamp(_minFitScale, 1.0);
+    }
+    if (available.width.isFinite && layout.size.width > available.width) {
+      final widthScale = (available.width / layout.size.width)
+          .clamp(_minWidthFitScale, 1.0);
+      if (widthScale < scale) scale = widthScale;
+    }
+    if (scale < 1) {
       layout.dispose();
       layout = MathLayout(
         document,
@@ -176,7 +188,10 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
                 final layout = _layout = _buildLayout(
                   hasInput ? calc.input.document : MathDocument.parse('0'),
                   style,
-                  constraints.maxHeight,
+                  Size(
+                    constraints.maxWidth - 2 * gutter,
+                    constraints.maxHeight,
+                  ),
                 );
 
                 final CaretMetrics caret;
@@ -229,7 +244,7 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
                                 child: CustomPaint(
                                   key: _paintKey,
                                   size: layout.size,
-                                  painter: _MathPainter(layout),
+                                  painter: MathPainter(layout),
                                 ),
                               ),
                             ),
@@ -257,19 +272,6 @@ class _ExpressionDisplayState extends State<ExpressionDisplay>
       },
     );
   }
-}
-
-class _MathPainter extends CustomPainter {
-  const _MathPainter(this.layout);
-
-  final MathLayout layout;
-
-  @override
-  void paint(Canvas canvas, Size size) => layout.paint(canvas, Offset.zero);
-
-  @override
-  bool shouldRepaint(_MathPainter oldDelegate) =>
-      !identical(oldDelegate.layout, layout);
 }
 
 class _Cursor extends StatelessWidget {
